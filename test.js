@@ -76,4 +76,13 @@ for (var i = 0; i < 200; i++) {
   assert.deepStrictEqual(WD.generate("seed-" + i).words, q.words);
 }
 
+// the generator only reaches for words people have actually heard of
+var WORDS = WD.WORDS;
+for (var j = 0; j < 300; j++) {
+  var gen = WD.generate("common-" + j);
+  Object.keys(gen.words).forEach(function (k) {
+    assert.ok(WORDS.indexOf(gen.words[k]) <= WD.COMMON_CAP, "too obscure: " + gen.words[k]);
+  });
+}
+
 console.log("all acceptance checks passed");

@@ -25,13 +25,20 @@ Difficulty pre-reveals 0, 1 or 2 point letters.
 |---|---|
 | `index.html` | The whole UI — layout, styling, input |
 | `game.js` | Puzzle generation, validation, classification, game state |
-| `words.js` | 2,315 common five-letter words |
+| `words.js` | 2,315 five-letter words, ordered most-used first |
+| `icon.svg`, `icon-*.png`, `manifest.json` | Home-screen icon: a W built from letter tiles |
 | `test.js` | The design brief's acceptance checks — `node test.js` |
 
 The generator is the backtracking one from the brief: pick a top-left word, which fixes L and T;
 pick a top-right word starting with T, which fixes R; pick a bottom-left word starting with L, which
 fixes B; the bottom-right word is then a single index probe for `B _ _ _ R`. Puzzles are kept only
-when they use 8–14 distinct letters. This dictionary yields **255,023,496** legal diamonds.
+when they use 8–14 distinct letters.
+
+Word choice leans on familiarity. `words.js` is sorted by Norvig unigram counts, most-used first, so
+every candidate pool is already in frequency order; the generator then biases its pick toward the
+front of each pool and refuses any puzzle containing a word past position `COMMON_CAP` (1400). That
+keeps TULLE, DOWRY, WOOER and friends out of the board while leaving about 34 million legal diamonds
+to draw from. They stay legal words — a hand-authored puzzle may still use them.
 
 Two themes: a plain Wordle-style light palette, and the original purple dark one. The moon button
 in the header switches between them and the choice is remembered.

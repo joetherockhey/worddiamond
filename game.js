@@ -6,10 +6,16 @@
   var ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var MAX_DEMERITS = 4;
 
+  // How rare a word may be before the generator refuses it. WORDS is ordered
+  // most-used first, so this is a position in that list. Everything past it
+  // (TULLE, DOWRY, WOOER...) still counts as a legal word, it just never shows up.
+  var COMMON_CAP = 1400;
+
   // ---------- puzzle generation ----------
 
-  var byFirst = {}, byPair = {};
-  WORDS.forEach(function (w) {
+  var byFirst = {}, byPair = {}, rank = {};
+  WORDS.forEach(function (w, i) {
+    rank[w] = i;
     (byFirst[w[0]] = byFirst[w[0]] || []).push(w);
     (byPair[w[0] + w[4]] = byPair[w[0] + w[4]] || []).push(w);
   });
@@ -39,7 +45,9 @@
   // TL = L___T, TR = T___R, BL = L___B, BR = B___R
   function generate(seed) {
     var rand = mulberry32(hashSeed(String(seed)));
-    var pick = function (a) { return a[Math.floor(rand() * a.length)]; };
+    // every pool is in most-used-first order, so squashing the index toward the
+    // front is all it takes to favour familiar words over technically-legal ones
+    var pick = function (a) { return a[Math.floor(rand() * rand() * a.length)]; };
 
     for (var tries = 0; tries < 50000; tries++) {
       var TL = pick(WORDS);
@@ -60,6 +68,8 @@
       if (!pool.length) continue;
 
       var BR = pick(pool);
+      if (Math.max(rank[TL], rank[TR], rank[BL], rank[BR]) > COMMON_CAP) continue;
+
       var letters = distinctLetters([TL, TR, BL, BR]);
       if (letters.length < 8 || letters.length > 14) continue; // quality gate
 
@@ -193,7 +203,7 @@
 
   var api = {
     WORDS: WORDS, SIDES: SIDES, ALPHA: ALPHA, MAX_DEMERITS: MAX_DEMERITS,
-    generate: generate, makePuzzle: makePuzzle, validate: validate,
+    generate: generate, makePuzzle: makePuzzle, validate: validate, COMMON_CAP: COMMON_CAP,
     classify: classify, distinctLetters: distinctLetters,
     newGame: newGame, guess: guess, hiddenCells: hiddenCells, revealAll: revealAll
   };
