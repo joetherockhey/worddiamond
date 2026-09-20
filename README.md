@@ -3,8 +3,6 @@
 Four five-letter words locked into a diamond by four shared point letters. Guess letters one at a
 time — never a whole word — and watch the shape fill.
 
-There is no on-screen keyboard: tap the field under the board and your own keyboard opens.
-
 **Play: https://joetherockhey.github.io/worddiamond/**
 
 ## Rules

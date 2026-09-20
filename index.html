@@ -39,7 +39,7 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
   background:linear-gradient(90deg,var(--yellow),var(--red));transition:width .3s}
 
 /* ---- board ---- */
-.board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto;cursor:pointer}
+.board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto}
 .cell{
   position:absolute;width:13.2%;aspect-ratio:1;transform:translate(-50%,-50%);
   display:grid;place-items:center;border-radius:6px;
@@ -74,16 +74,19 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
 @keyframes shake{0%,100%{transform:rotate(45deg)}25%{transform:rotate(45deg) translateX(-4px)}
   75%{transform:rotate(45deg) translateX(4px)}}
 
-/* ---- the only input: tap it, your own keyboard opens ---- */
-.typer{
-  width:min(94vw,400px);height:54px;border:2px solid var(--line);border-radius:8px;
-  font-family:inherit;font-size:17px;font-weight:700;text-align:center;letter-spacing:.06em;
-  color:transparent;caret-color:transparent;background:#fff;
+/* ---- keyboard ---- */
+.kb{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.kb .row{display:flex;gap:6px;justify-content:center}
+.key{
+  flex:1 1 0;max-width:46px;height:clamp(46px,9vw,56px);border:0;border-radius:4px;
+  font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;color:var(--ink);
+  background:var(--line);cursor:pointer;transition:transform .1s,background .2s;
 }
-.typer::placeholder{color:var(--dim);font-weight:600;letter-spacing:.02em;opacity:1}
-.typer:focus{outline:none;border-color:var(--ink)}
-.typer:focus::placeholder{color:#b1b4b6}
-.typer:disabled{background:var(--soft)}
+.key:active{transform:scale(.92)}
+.key.green{background:var(--green);color:#fff}
+.key.yellow{background:var(--yellow);color:#fff}
+.key.red{background:var(--red);color:#fff}
+.key:disabled{cursor:default}
 
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 button.act,select{
@@ -124,9 +127,7 @@ details b{color:var(--ink)}
 <div class="board" id="board"></div>
 <div class="tray" id="tray"></div>
 
-<input class="typer" id="typer" type="text" inputmode="text" autocomplete="off" autocorrect="off"
-       autocapitalize="characters" spellcheck="false" enterkeyhint="done" maxlength="1"
-       aria-label="Type a letter to guess" placeholder="Tap here, then type a letter">
+<div class="kb" id="kb"></div>
 
 <div class="controls">
   <button class="act" id="newBtn">New puzzle</button>
@@ -183,12 +184,30 @@ details b{color:var(--ink)}
     run(WD.SIDES.bottomRight, "B", "R");
   })();
 
+  var ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   var EPOCH = Date.UTC(2026, 0, 1);
-  var game = null, mode = "daily", cellEls = {}, chipEls = {};
+  var game = null, mode = "daily", cellEls = {}, chipEls = {}, keyEls = {};
 
   function dayNumber() {
     var n = new Date();
     return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 86400000) + 1;
+  }
+
+  function buildKeyboard() {
+    ROWS.forEach(function (row) {
+      var el = document.createElement("div");
+      el.className = "row";
+      row.split("").forEach(function (c) {
+        var k = document.createElement("button");
+        k.className = "key";
+        k.textContent = c;
+        k.setAttribute("aria-label", "Guess " + c);
+        k.onclick = function () { play(c); };
+        el.appendChild(k);
+        keyEls[c] = k;
+      });
+      $("kb").appendChild(el);
+    });
   }
 
   function buildBoard() {
@@ -246,6 +265,9 @@ details b{color:var(--ink)}
       }
       return;
     }
+    keyEls[letter].classList.add(out.result);
+    keyEls[letter].disabled = true;
+
     var chip = document.createElement("div");
     chip.className = "chip " + out.result;
     chip.innerHTML = "<span>" + letter + "</span>";
@@ -253,7 +275,7 @@ details b{color:var(--ink)}
     chipEls[letter] = chip;
 
     paint(out.revealed);
-    if (game.status !== "playing") { $("typer").blur(); setTimeout(finish, 700); }
+    if (game.status !== "playing") setTimeout(finish, 700);
   }
 
   function finish() {
@@ -262,7 +284,6 @@ details b{color:var(--ink)}
     WD.revealAll(game);
     stillHidden.forEach(function (id) { cellEls[id].classList.add("late"); });
     paint(stillHidden);
-    $("typer").disabled = true;
 
     $("resultTitle").textContent = won ? "Diamond complete" : "Out of road";
     $("resultSub").textContent = won
@@ -291,8 +312,10 @@ details b{color:var(--ink)}
     $("sub").textContent = mode === "daily" ? "Daily #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
     chipEls = {};
-    $("typer").disabled = false;
-    $("typer").value = "";
+    Object.keys(keyEls).forEach(function (c) {
+      keyEls[c].className = "key";
+      keyEls[c].disabled = false;
+    });
     $("overlay").classList.remove("show");
     buildBoard();
     paint(null);
@@ -300,17 +323,7 @@ details b{color:var(--ink)}
 
   function randomSeed() { return "rand-" + Date.now() + "-" + Math.random(); }
 
-  // The input is the only guess surface: tapping it opens the phone's own keyboard.
-  // It is kept empty, so every keystroke is one guess.
-  $("typer").addEventListener("input", function (e) {
-    var v = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
-    e.target.value = "";
-    if (v) play(v[v.length - 1]);
-  });
-  $("board").addEventListener("click", function () {
-    if (!$("typer").disabled) $("typer").focus();
-  });
-
+  buildKeyboard();
   $("newBtn").onclick = function () { start(randomSeed()); };
   $("againBtn").onclick = function () { start(randomSeed()); };
   $("dailyBtn").onclick = function () { start(null); };
@@ -325,10 +338,9 @@ details b{color:var(--ink)}
       setTimeout(function () { $("shareBtn").textContent = "Share"; }, 1400);
     }
   };
-  // desktop: just type, no need to click into the field first
+  // desktop: a physical keyboard works too
   document.addEventListener("keydown", function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (document.activeElement === $("typer")) return;
     if (game.status !== "playing") return;
     var c = e.key.toUpperCase();
     if (c.length === 1 && c >= "A" && c <= "Z") play(c);
