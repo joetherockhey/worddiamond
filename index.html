@@ -5,36 +5,78 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>WordDiamond</title>
 <meta name="description" content="Four five-letter words locked into a diamond. Guess letters, watch the shape fill.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#ffffff" id="themeColor">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 96,50 50,96 4,50' fill='%231a1a1b'/%3E%3C/svg%3E">
 <style>
+/* ---- light theme (default) ---- */
 :root{
-  /* feedback colours - the three-colour language */
-  --green:#6aaa64; --yellow:#c9b458; --red:#e05c5c;
-  --green-soft:rgba(106,170,100,.45);
-  /* theme */
-  --ink:#1a1a1b; --dim:#787c7e; --line:#d3d6da; --soft:#f6f7f8; --fill:#3a3a3c;
+  --green:#6aaa64; --yellow:#c9b458; --red:#e05c5c; --chip-ink:#fff; --key-on-ink:#fff;
+  --ink:#1a1a1b; --dim:#787c7e; --line:#d3d6da; --soft:#f6f7f8;
+  --bg:#fff;
+  --cell-bg:#fff; --cell-border:var(--line);
+  --point-border:#878a8c; --point-bg:var(--soft);
+  --on-bg:#3a3a3c; --on-ink:#fff; --on-shadow:none;
+  --point-on-bg:#1a1a1b; --point-on-shadow:none;
+  --late-bg:#c7cacd; --late-ink:#fff;
+  --done-ring:rgba(106,170,100,.45);
+  --badge-bg:#1a1a1b; --badge-ink:#fff; --badge-sub:#b9bcbe; --badge-shadow:none;
+  --key-bg:#d3d6da; --key-ink:var(--ink);
+  --btn-bg:#fff; --btn-hover:var(--soft);
+  --meter-track:#e8eaec;
+  --card-bg:#fff; --scrim:rgba(26,26,27,.55); --blur:none;
 }
+/* ---- dark theme ---- */
+:root[data-theme="dark"]{
+  --green:#22c55e; --yellow:#fbbf24; --red:#fb5a76; --chip-ink:#12081f; --key-on-ink:#12081f;
+  --ink:#f6f2ff; --dim:#b6a8e0; --line:rgba(255,255,255,.18); --soft:rgba(255,255,255,.07);
+  --bg:
+    radial-gradient(110% 80% at 12% 0%, #4c1d95 0%, transparent 55%),
+    radial-gradient(90% 70% at 92% 8%, #0e7490 0%, transparent 50%),
+    radial-gradient(120% 90% at 50% 110%, #9d174d 0%, transparent 55%),
+    #160c2e;
+  --cell-bg:rgba(255,255,255,.06); --cell-border:rgba(255,255,255,.16);
+  --point-border:#ffd166; --point-bg:rgba(255,209,102,.12);
+  --on-bg:linear-gradient(160deg,#fff,#ded4ff); --on-ink:#1a0f2e;
+  --on-shadow:0 6px 18px rgba(124,58,237,.45);
+  --point-on-bg:linear-gradient(160deg,#ffd166,#ffb457); --point-on-shadow:0 6px 20px rgba(255,180,87,.5);
+  --late-bg:linear-gradient(160deg,#a99ccc,#8b7fb3); --late-ink:#241638;
+  --done-ring:rgba(77,216,230,.55);
+  --badge-bg:linear-gradient(140deg,rgba(244,114,182,.92),rgba(124,58,237,.92));
+  --badge-ink:#fff; --badge-sub:#ffe9f6; --badge-shadow:0 10px 30px rgba(244,114,182,.35);
+  --key-bg:rgba(255,255,255,.14); --key-ink:var(--ink);
+  --btn-bg:rgba(255,255,255,.12); --btn-hover:rgba(255,255,255,.2);
+  --meter-track:rgba(255,255,255,.12);
+  --card-bg:linear-gradient(165deg,#2c1b56,#1a0f36); --scrim:rgba(10,4,24,.82); --blur:blur(6px);
+}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
 body{
   font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
-  background:#fff;color:var(--ink);
+  background:var(--bg);background-attachment:fixed;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;
   padding:0 12px 26px;gap:10px;
 }
 
-header{width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
+header{position:relative;width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
   border-bottom:1px solid var(--line);margin-bottom:6px}
 h1{margin:0 0 2px;font-size:clamp(26px,7vw,36px);font-weight:800;letter-spacing:.01em}
+[data-theme="dark"] h1{
+  background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
 h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);margin-top:3px}
+  color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:3px}
+.themeBtn{
+  position:absolute;right:0;top:6px;width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
+  font-size:17px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.themeBtn:hover{background:var(--btn-hover)}
 .stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .stat{border:1px solid var(--line);border-radius:6px;padding:5px 12px;min-width:86px;line-height:1.15}
 .stat b{display:block;font-size:17px;font-weight:700}
 .stat span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .meter{width:100%;max-width:300px;height:6px;margin:10px auto 0;border-radius:99px;
-  background:#e8eaec;overflow:hidden}
+  background:var(--meter-track);overflow:hidden}
 .meter i{display:block;height:100%;width:0;border-radius:99px;
   background:linear-gradient(90deg,var(--yellow),var(--red));transition:width .3s}
 
@@ -44,30 +86,31 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
   position:absolute;width:13.2%;aspect-ratio:1;transform:translate(-50%,-50%);
   display:grid;place-items:center;border-radius:6px;
   font-size:clamp(15px,4.6vw,25px);font-weight:700;
-  background:#fff;border:2px solid var(--line);color:transparent;
+  background:var(--cell-bg);border:2px solid var(--cell-border);color:transparent;
   transition:background .2s,border-color .2s,box-shadow .2s;
 }
-.cell.point{border-radius:50%;border-color:#878a8c;background:var(--soft)}
-.cell.on{background:var(--fill);border-color:var(--fill);color:#fff}
-.cell.point.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.cell.late.on{background:#c7cacd;border-color:#c7cacd;color:#fff}
-.cell.done{box-shadow:0 0 0 3px var(--green-soft)}
+.cell.point{border-radius:50%;border-color:var(--point-border);background:var(--point-bg)}
+.cell.on{background:var(--on-bg);border-color:transparent;color:var(--on-ink);box-shadow:var(--on-shadow)}
+.cell.point.on{background:var(--point-on-bg);box-shadow:var(--point-on-shadow)}
+.cell.late.on{background:var(--late-bg);color:var(--late-ink);box-shadow:none}
+.cell.done{box-shadow:0 0 0 3px var(--done-ring)}
 .cell.pop{animation:pop .4s ease}
 @keyframes pop{0%{transform:translate(-50%,-50%) scale(.35)}
   60%{transform:translate(-50%,-50%) scale(1.14)}100%{transform:translate(-50%,-50%) scale(1)}}
 .badge{
   position:absolute;left:50%;top:50%;width:30%;aspect-ratio:1;
   transform:translate(-50%,-50%) rotate(45deg);border-radius:8%;
-  display:grid;place-items:center;background:var(--ink);pointer-events:none;
+  display:grid;place-items:center;background:var(--badge-bg);box-shadow:var(--badge-shadow);
+  pointer-events:none;
 }
 .badge>div{transform:rotate(-45deg);text-align:center;line-height:1}
-.badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:#fff}
-.badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:#b9bcbe;letter-spacing:.03em}
+.badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:var(--badge-ink)}
+.badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:var(--badge-sub);letter-spacing:.03em}
 
 /* ---- tray ---- */
 .tray{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;width:min(94vw,560px);min-height:28px}
 .chip{width:26px;height:26px;transform:rotate(45deg);border-radius:4px;display:grid;place-items:center;
-  font-size:12px;font-weight:700;color:#fff;animation:pop .3s ease}
+  font-size:12px;font-weight:700;color:var(--chip-ink);animation:pop .3s ease}
 .chip span{transform:rotate(-45deg)}
 .chip.green{background:var(--green)}.chip.yellow{background:var(--yellow)}.chip.red{background:var(--red)}
 .chip.again{animation:shake .4s ease}
@@ -79,30 +122,32 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
 .kb .row{display:flex;gap:6px;justify-content:center}
 .key{
   flex:1 1 0;max-width:46px;height:clamp(46px,9vw,56px);border:0;border-radius:4px;
-  font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;color:var(--ink);
-  background:var(--line);cursor:pointer;transition:transform .1s,background .2s;
+  font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;color:var(--key-ink);
+  background:var(--key-bg);cursor:pointer;transition:transform .1s,background .2s;
 }
 .key:active{transform:scale(.92)}
-.key.green{background:var(--green);color:#fff}
-.key.yellow{background:var(--yellow);color:#fff}
-.key.red{background:var(--red);color:#fff}
+.key.green{background:var(--green);color:var(--key-on-ink)}
+.key.yellow{background:var(--yellow);color:var(--key-on-ink)}
+.key.red{background:var(--red);color:var(--key-on-ink)}
 .key:disabled{cursor:default}
 
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 button.act,select{
   font-family:inherit;font-weight:700;font-size:14px;color:var(--ink);
-  background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer}
-button.act:hover,select:hover{background:var(--soft)}
-button.act.go{background:var(--green);border-color:var(--green);color:#fff}
+  background:var(--btn-bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer}
+button.act:hover,select:hover{background:var(--btn-hover)}
+button.act.go{background:var(--green);border-color:var(--green);color:var(--key-on-ink)}
+select option{color:#1b1035;background:#fff}
 details{width:min(94vw,560px);font-size:13.5px;color:var(--dim);line-height:1.55}
 details summary{cursor:pointer;font-weight:700;color:var(--ink);padding:6px 0}
 details b{color:var(--ink)}
 
 /* ---- end screen ---- */
-.overlay{position:fixed;inset:0;background:rgba(26,26,27,.55);
+.overlay{position:fixed;inset:0;background:var(--scrim);backdrop-filter:var(--blur);
   display:none;place-items:center;padding:18px;z-index:9}
 .overlay.show{display:grid}
-.card{width:min(94vw,420px);background:#fff;border-radius:12px;padding:24px;text-align:center;
+.card{width:min(94vw,420px);background:var(--card-bg);border:1px solid var(--line);
+  border-radius:12px;padding:24px;text-align:center;
   box-shadow:0 18px 50px rgba(0,0,0,.28);animation:pop .3s ease}
 .card h2{margin:0 0 4px;font-size:25px;font-weight:800}
 .card p{margin:0 0 16px;color:var(--dim);font-size:14px}
@@ -115,6 +160,7 @@ details b{color:var(--ink)}
 <body>
 
 <header>
+  <button class="themeBtn" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode">&#127769;</button>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
   <div class="stats">
     <div class="stat"><b id="hiddenCount">16</b><span>hidden</span></div>
@@ -147,8 +193,7 @@ details b{color:var(--ink)}
   <b>Yellow</b> &mdash; not on the diamond, but one of its alphabet neighbours is. Costs 0.5.<br>
   <b>Red</b> &mdash; neither it nor its neighbours are here. Costs 1.0. No wrap: A only touches B, Z only touches Y.</p>
   <p>The centre badge is a free clue: one letter that is definitely in the puzzle, and how many
-  different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.
-  The row of diamonds under the board is your record of what you have already tried.</p>
+  different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.</p>
 </details>
 
 <div class="overlay" id="overlay">
@@ -169,6 +214,20 @@ details b{color:var(--ink)}
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
+
+  // ---- theme ----
+  function setTheme(name) {
+    document.documentElement.dataset.theme = name;
+    var dark = name === "dark";
+    $("themeBtn").innerHTML = dark ? "☀️" : "🌙";
+    $("themeBtn").title = $("themeBtn").ariaLabel = "Switch to " + (dark ? "light" : "dark") + " mode";
+    $("themeColor").content = dark ? "#160c2e" : "#ffffff";
+    try { localStorage.setItem("wd-theme", name); } catch (e) {}
+  }
+  try { setTheme(localStorage.getItem("wd-theme") || "light"); } catch (e) { setTheme("light"); }
+  $("themeBtn").onclick = function () {
+    setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+  };
 
   // Cell positions in a 0..100 diamond space, then pulled inward so edge cells stay on screen.
   var POS = {};

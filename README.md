@@ -33,7 +33,8 @@ pick a top-right word starting with T, which fixes R; pick a bottom-left word st
 fixes B; the bottom-right word is then a single index probe for `B _ _ _ R`. Puzzles are kept only
 when they use 8–14 distinct letters. This dictionary yields **255,023,496** legal diamonds.
 
-Theme is a plain Wordle-style palette; the green/yellow/red feedback colours are the only hues.
+Two themes: a plain Wordle-style light palette, and the original purple dark one. The moon button
+in the header switches between them and the choice is remembered.
 
 The daily puzzle is seeded from the date, so everyone gets the same board on the same day.
 
