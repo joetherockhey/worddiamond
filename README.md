@@ -1,7 +1,9 @@
 # WordDiamond
 
 Four five-letter words locked into a diamond by four shared point letters. Guess letters one at a
-time from the keyboard — never a whole word — and watch the shape fill.
+time — never a whole word — and watch the shape fill.
+
+There is no on-screen keyboard: tap the field under the board and your own keyboard opens.
 
 **Play: https://joetherockhey.github.io/worddiamond/**
 
@@ -32,6 +34,8 @@ The generator is the backtracking one from the brief: pick a top-left word, whic
 pick a top-right word starting with T, which fixes R; pick a bottom-left word starting with L, which
 fixes B; the bottom-right word is then a single index probe for `B _ _ _ R`. Puzzles are kept only
 when they use 8–14 distinct letters. This dictionary yields **255,023,496** legal diamonds.
+
+Theme is a plain Wordle-style palette; the green/yellow/red feedback colours are the only hues.
 
 The daily puzzle is seeded from the date, so everyone gets the same board on the same day.
 

@@ -5,123 +5,107 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>WordDiamond</title>
 <meta name="description" content="Four five-letter words locked into a diamond. Guess letters, watch the shape fill.">
-<meta name="theme-color" content="#160c2e">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 96,50 50,96 4,50' fill='%23f472b6'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 96,50 50,96 4,50' fill='%231a1a1b'/%3E%3C/svg%3E">
 <style>
 :root{
-  --green:#22c55e; --yellow:#fbbf24; --red:#fb5a76;
-  --ink:#f6f2ff; --dim:#b6a8e0;
-  --gold:#ffd166; --pink:#f472b6; --cyan:#4dd8e6;
-  --cell:13.2%;
+  /* feedback colours - the three-colour language */
+  --green:#6aaa64; --yellow:#c9b458; --red:#e05c5c;
+  --green-soft:rgba(106,170,100,.45);
+  /* theme */
+  --ink:#1a1a1b; --dim:#787c7e; --line:#d3d6da; --soft:#f6f7f8; --fill:#3a3a3c;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
 body{
-  font-family:Outfit,"Segoe UI",system-ui,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(110% 80% at 12% 0%, #4c1d95 0%, transparent 55%),
-    radial-gradient(90% 70% at 92% 8%, #0e7490 0%, transparent 50%),
-    radial-gradient(120% 90% at 50% 110%, #9d174d 0%, transparent 55%),
-    #160c2e;
-  background-attachment:fixed;
+  font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  background:#fff;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;
-  padding:10px 12px 26px;gap:10px;
+  padding:0 12px 26px;gap:10px;
 }
-header{width:100%;max-width:560px;text-align:center}
-h1{
-  margin:2px 0 8px;font-size:clamp(26px,7vw,40px);font-weight:900;letter-spacing:-.02em;
-  background:linear-gradient(92deg,var(--gold),var(--pink) 45%,var(--cyan));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-h1 small{display:block;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:0}
-.stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;
-  padding:5px 12px;min-width:86px;line-height:1.15}
-.stat b{display:block;font-size:17px;font-weight:800}
-.stat span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-.meter{width:100%;max-width:300px;height:7px;margin:8px auto 0;border-radius:99px;
-  background:rgba(255,255,255,.12);overflow:hidden}
+
+header{width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
+  border-bottom:1px solid var(--line);margin-bottom:6px}
+h1{margin:0 0 2px;font-size:clamp(26px,7vw,36px);font-weight:800;letter-spacing:.01em}
+h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);margin-top:3px}
+.stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.stat{border:1px solid var(--line);border-radius:6px;padding:5px 12px;min-width:86px;line-height:1.15}
+.stat b{display:block;font-size:17px;font-weight:700}
+.stat span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.meter{width:100%;max-width:300px;height:6px;margin:10px auto 0;border-radius:99px;
+  background:#e8eaec;overflow:hidden}
 .meter i{display:block;height:100%;width:0;border-radius:99px;
   background:linear-gradient(90deg,var(--yellow),var(--red));transition:width .3s}
 
 /* ---- board ---- */
-.board{position:relative;width:min(92vw,500px);aspect-ratio:1;margin:0 auto}
+.board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto;cursor:pointer}
 .cell{
-  position:absolute;width:var(--cell);aspect-ratio:1;transform:translate(-50%,-50%);
-  display:grid;place-items:center;border-radius:13px;
-  font-size:clamp(15px,4.6vw,26px);font-weight:800;
-  background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.16);
-  color:transparent;transition:background .25s,border-color .25s,box-shadow .25s;
+  position:absolute;width:13.2%;aspect-ratio:1;transform:translate(-50%,-50%);
+  display:grid;place-items:center;border-radius:6px;
+  font-size:clamp(15px,4.6vw,25px);font-weight:700;
+  background:#fff;border:2px solid var(--line);color:transparent;
+  transition:background .2s,border-color .2s,box-shadow .2s;
 }
-.cell.point{border-color:var(--gold);background:rgba(255,209,102,.12);border-radius:50%}
-.cell.on{color:#1a0f2e;background:linear-gradient(160deg,#ffffff,#ded4ff);border-color:#fff;
-  box-shadow:0 6px 18px rgba(124,58,237,.45)}
-.cell.point.on{background:linear-gradient(160deg,var(--gold),#ffb457);border-color:#fff8e1;
-  box-shadow:0 6px 20px rgba(255,180,87,.5)}
-.cell.late.on{background:linear-gradient(160deg,#a99ccc,#8b7fb3);color:#241638;box-shadow:none}
-.cell.pop{animation:pop .42s ease}
-@keyframes pop{0%{transform:translate(-50%,-50%) scale(.3) rotate(-12deg)}
-  60%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
-.cell.done{box-shadow:0 0 0 3px rgba(77,216,230,.55),0 6px 18px rgba(77,216,230,.35)}
+.cell.point{border-radius:50%;border-color:#878a8c;background:var(--soft)}
+.cell.on{background:var(--fill);border-color:var(--fill);color:#fff}
+.cell.point.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.cell.late.on{background:#c7cacd;border-color:#c7cacd;color:#fff}
+.cell.done{box-shadow:0 0 0 3px var(--green-soft)}
+.cell.pop{animation:pop .4s ease}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.35)}
+  60%{transform:translate(-50%,-50%) scale(1.14)}100%{transform:translate(-50%,-50%) scale(1)}}
 .badge{
   position:absolute;left:50%;top:50%;width:30%;aspect-ratio:1;
-  transform:translate(-50%,-50%) rotate(45deg);
-  border-radius:16%;display:grid;place-items:center;
-  background:linear-gradient(140deg,rgba(244,114,182,.92),rgba(124,58,237,.92));
-  border:2px solid rgba(255,255,255,.55);box-shadow:0 10px 30px rgba(244,114,182,.35);
-  pointer-events:none;
+  transform:translate(-50%,-50%) rotate(45deg);border-radius:8%;
+  display:grid;place-items:center;background:var(--ink);pointer-events:none;
 }
 .badge>div{transform:rotate(-45deg);text-align:center;line-height:1}
-.badge b{font-size:clamp(26px,9vw,46px);font-weight:900;display:block}
-.badge span{font-size:clamp(9px,2.6vw,12px);font-weight:700;color:#ffe9f6;letter-spacing:.04em}
+.badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:#fff}
+.badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:#b9bcbe;letter-spacing:.03em}
 
-/* ---- tray + keyboard ---- */
+/* ---- tray ---- */
 .tray{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;width:min(94vw,560px);min-height:28px}
-.chip{width:26px;height:26px;transform:rotate(45deg);border-radius:6px;display:grid;place-items:center;
-  font-size:12px;font-weight:800;color:#12081f;animation:pop .3s ease}
+.chip{width:26px;height:26px;transform:rotate(45deg);border-radius:4px;display:grid;place-items:center;
+  font-size:12px;font-weight:700;color:#fff;animation:pop .3s ease}
 .chip span{transform:rotate(-45deg)}
 .chip.green{background:var(--green)}.chip.yellow{background:var(--yellow)}.chip.red{background:var(--red)}
-.kb{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;margin-top:2px}
-.kb .row{display:flex;gap:5px;justify-content:center}
-.key{
-  flex:1 1 0;max-width:48px;height:clamp(42px,8.4vw,52px);border:0;border-radius:10px;
-  font-family:inherit;font-size:clamp(14px,4vw,18px);font-weight:800;color:var(--ink);
-  background:rgba(255,255,255,.14);cursor:pointer;transition:transform .1s,background .2s;
+.chip.again{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:rotate(45deg)}25%{transform:rotate(45deg) translateX(-4px)}
+  75%{transform:rotate(45deg) translateX(4px)}}
+
+/* ---- the only input: tap it, your own keyboard opens ---- */
+.typer{
+  width:min(94vw,400px);height:54px;border:2px solid var(--line);border-radius:8px;
+  font-family:inherit;font-size:17px;font-weight:700;text-align:center;letter-spacing:.06em;
+  color:transparent;caret-color:transparent;background:#fff;
 }
-.key:active{transform:scale(.92)}
-.key.green{background:var(--green);color:#06230f}
-.key.yellow{background:var(--yellow);color:#33230a}
-.key.red{background:var(--red);color:#33060f}
-.key:disabled{cursor:default}
+.typer::placeholder{color:var(--dim);font-weight:600;letter-spacing:.02em;opacity:1}
+.typer:focus{outline:none;border-color:var(--ink)}
+.typer:focus::placeholder{color:#b1b4b6}
+.typer:disabled{background:var(--soft)}
 
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 button.act,select{
   font-family:inherit;font-weight:700;font-size:14px;color:var(--ink);
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  border-radius:11px;padding:9px 14px;cursor:pointer}
-button.act:hover,select:hover{background:rgba(255,255,255,.2)}
-select option{color:#1b1035}
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer}
+button.act:hover,select:hover{background:var(--soft)}
+button.act.go{background:var(--green);border-color:var(--green);color:#fff}
 details{width:min(94vw,560px);font-size:13.5px;color:var(--dim);line-height:1.55}
 details summary{cursor:pointer;font-weight:700;color:var(--ink);padding:6px 0}
 details b{color:var(--ink)}
 
 /* ---- end screen ---- */
-.overlay{position:fixed;inset:0;background:rgba(10,4,24,.82);backdrop-filter:blur(6px);
+.overlay{position:fixed;inset:0;background:rgba(26,26,27,.55);
   display:none;place-items:center;padding:18px;z-index:9}
 .overlay.show{display:grid}
-.card{width:min(94vw,420px);background:linear-gradient(165deg,#2c1b56,#1a0f36);
-  border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:22px;text-align:center;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);animation:pop .35s ease}
-.card h2{margin:0 0 4px;font-size:27px;font-weight:900}
-.card p{margin:0 0 14px;color:var(--dim);font-size:14px}
-.words{display:grid;gap:7px;margin-bottom:16px}
-.words div{display:flex;justify-content:space-between;gap:10px;background:rgba(255,255,255,.07);
-  border-radius:10px;padding:8px 12px;font-weight:800;letter-spacing:.12em}
+.card{width:min(94vw,420px);background:#fff;border-radius:12px;padding:24px;text-align:center;
+  box-shadow:0 18px 50px rgba(0,0,0,.28);animation:pop .3s ease}
+.card h2{margin:0 0 4px;font-size:25px;font-weight:800}
+.card p{margin:0 0 16px;color:var(--dim);font-size:14px}
+.words{display:grid;gap:7px;margin-bottom:18px}
+.words div{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);
+  border-radius:8px;padding:9px 12px;font-weight:800;letter-spacing:.14em}
 .words div i{font-style:normal;font-weight:600;letter-spacing:0;color:var(--dim);font-size:12px;align-self:center}
 </style>
 </head>
@@ -139,7 +123,10 @@ details b{color:var(--ink)}
 
 <div class="board" id="board"></div>
 <div class="tray" id="tray"></div>
-<div class="kb" id="kb"></div>
+
+<input class="typer" id="typer" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+       autocapitalize="characters" spellcheck="false" enterkeyhint="done" maxlength="1"
+       aria-label="Type a letter to guess" placeholder="Tap here, then type a letter">
 
 <div class="controls">
   <button class="act" id="newBtn">New puzzle</button>
@@ -154,12 +141,13 @@ details b{color:var(--ink)}
 <details>
   <summary>How to play</summary>
   <p>Four five-letter words are locked into a diamond. They share their <b>point letters</b> &mdash; the
-  gold circles belong to two words at once. Tap letters on the keyboard; you never type a whole word.</p>
+  circles belong to two words at once. Guess one letter at a time; you never type a whole word.</p>
   <p><b>Green</b> &mdash; the letter is somewhere on the diamond. Every matching cell flips at once. Free.<br>
   <b>Yellow</b> &mdash; not on the diamond, but one of its alphabet neighbours is. Costs 0.5.<br>
   <b>Red</b> &mdash; neither it nor its neighbours are here. Costs 1.0. No wrap: A only touches B, Z only touches Y.</p>
   <p>The centre badge is a free clue: one letter that is definitely in the puzzle, and how many
-  different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.</p>
+  different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.
+  The row of diamonds under the board is your record of what you have already tried.</p>
 </details>
 
 <div class="overlay" id="overlay">
@@ -168,7 +156,7 @@ details b{color:var(--ink)}
     <p id="resultSub"></p>
     <div class="words" id="resultWords"></div>
     <div class="controls">
-      <button class="act" id="shareBtn">Share</button>
+      <button class="act go" id="shareBtn">Share</button>
       <button class="act" id="againBtn">New puzzle</button>
     </div>
   </div>
@@ -195,31 +183,12 @@ details b{color:var(--ink)}
     run(WD.SIDES.bottomRight, "B", "R");
   })();
 
-  var ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   var EPOCH = Date.UTC(2026, 0, 1);
-  var game = null, mode = "daily", cellEls = {}, keyEls = {};
+  var game = null, mode = "daily", cellEls = {}, chipEls = {};
 
   function dayNumber() {
     var n = new Date();
     return Math.floor((Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - EPOCH) / 86400000) + 1;
-  }
-
-  function buildKeyboard() {
-    $("kb").innerHTML = "";
-    ROWS.forEach(function (row) {
-      var el = document.createElement("div");
-      el.className = "row";
-      row.split("").forEach(function (c) {
-        var k = document.createElement("button");
-        k.className = "key";
-        k.textContent = c;
-        k.setAttribute("aria-label", "Guess " + c);
-        k.onclick = function () { play(c); };
-        el.appendChild(k);
-        keyEls[c] = k;
-      });
-      $("kb").appendChild(el);
-    });
   }
 
   function buildBoard() {
@@ -268,17 +237,23 @@ details b{color:var(--ink)}
 
   function play(letter) {
     var out = WD.guess(game, letter);
-    if (!out) return;
-    keyEls[letter].classList.add(out.result);
-    keyEls[letter].disabled = true;
-
+    if (!out) {
+      var old = chipEls[letter];   // already tried - nudge its diamond in the tray
+      if (old) {
+        old.classList.remove("again");
+        void old.offsetWidth;
+        old.classList.add("again");
+      }
+      return;
+    }
     var chip = document.createElement("div");
     chip.className = "chip " + out.result;
     chip.innerHTML = "<span>" + letter + "</span>";
     $("tray").appendChild(chip);
+    chipEls[letter] = chip;
 
     paint(out.revealed);
-    if (game.status !== "playing") setTimeout(finish, 700);
+    if (game.status !== "playing") { $("typer").blur(); setTimeout(finish, 700); }
   }
 
   function finish() {
@@ -287,6 +262,7 @@ details b{color:var(--ink)}
     WD.revealAll(game);
     stillHidden.forEach(function (id) { cellEls[id].classList.add("late"); });
     paint(stillHidden);
+    $("typer").disabled = true;
 
     $("resultTitle").textContent = won ? "Diamond complete" : "Out of road";
     $("resultSub").textContent = won
@@ -314,10 +290,9 @@ details b{color:var(--ink)}
     game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), parseInt($("diff").value, 10));
     $("sub").textContent = mode === "daily" ? "Daily #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
-    Object.keys(keyEls).forEach(function (c) {
-      keyEls[c].className = "key";
-      keyEls[c].disabled = false;
-    });
+    chipEls = {};
+    $("typer").disabled = false;
+    $("typer").value = "";
     $("overlay").classList.remove("show");
     buildBoard();
     paint(null);
@@ -325,7 +300,17 @@ details b{color:var(--ink)}
 
   function randomSeed() { return "rand-" + Date.now() + "-" + Math.random(); }
 
-  buildKeyboard();
+  // The input is the only guess surface: tapping it opens the phone's own keyboard.
+  // It is kept empty, so every keystroke is one guess.
+  $("typer").addEventListener("input", function (e) {
+    var v = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+    e.target.value = "";
+    if (v) play(v[v.length - 1]);
+  });
+  $("board").addEventListener("click", function () {
+    if (!$("typer").disabled) $("typer").focus();
+  });
+
   $("newBtn").onclick = function () { start(randomSeed()); };
   $("againBtn").onclick = function () { start(randomSeed()); };
   $("dailyBtn").onclick = function () { start(null); };
@@ -340,8 +325,11 @@ details b{color:var(--ink)}
       setTimeout(function () { $("shareBtn").textContent = "Share"; }, 1400);
     }
   };
+  // desktop: just type, no need to click into the field first
   document.addEventListener("keydown", function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (document.activeElement === $("typer")) return;
+    if (game.status !== "playing") return;
     var c = e.key.toUpperCase();
     if (c.length === 1 && c >= "A" && c <= "Z") play(c);
   });
