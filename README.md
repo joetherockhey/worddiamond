@@ -13,18 +13,18 @@ time — never a whole word — and watch the shape fill.
 - **Red** — the letter is not there. Costs 1.0.
 - **Yellow** — Easy only: not there, but an immediate alphabet neighbour is. Costs 0.5 instead of 1.0.
   No alphabet wrap: A only touches B, Z only touches Y.
-- Fill every cell before you reach **4.0 demerits**.
+- Fill every cell before you run out of demerits: 5.0 on Hard, 4.0 on Normal and Easy.
 - The centre badge counts how many of the puzzle's distinct letters you have turned up so far
   (“3 of 11 letters”). On Normal and Easy it also publishes one letter that is definitely in the
   puzzle — a clue only, it reveals nothing by itself.
 - Opening “How to play” fades in faint arrows in the four corners showing which way each word reads:
   both left-hand words start at the left point, both right-hand words end at the right point.
 
-| Level | Centre letter | Near misses |
-|---|---|---|
-| Hard (default) | hidden, badge shows `?` | every miss costs 1.0 |
-| Normal | published | every miss costs 1.0 |
-| Easy | published | yellow, 0.5 |
+| Level | Centre letter | Near misses | Budget |
+|---|---|---|---|
+| Hard (default) | hidden, badge shows `?` | every miss costs 1.0 | 5.0 |
+| Normal | published | every miss costs 1.0 | 4.0 |
+| Easy | published | yellow, 0.5 | 4.0 |
 
 The badge counts your progress at every level. The chosen level is remembered.
 

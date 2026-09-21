@@ -201,7 +201,7 @@ body.barred{padding-bottom:96px}
   <h1>WordDiamond<small id="sub">Daily</small></h1>
   <div class="stats">
     <div class="stat"><b id="hiddenCount">16</b><span>hidden</span></div>
-    <div class="stat"><b id="demeritLabel">0 / 4</b><span>demerits</span></div>
+    <div class="stat"><b id="demeritLabel">0 / 5</b><span>demerits</span></div>
     <div class="stat"><b id="letterCount">&mdash;</b><span>letters</span></div>
   </div>
   <div class="meter"><i id="meterFill"></i></div>
@@ -230,9 +230,10 @@ body.barred{padding-bottom:96px}
   <b>Red</b> &mdash; the letter is not here at all. Costs 1.0.<br>
   <b>Yellow</b> &mdash; on Easy only: the letter is not here, but one of its alphabet neighbours is.
   Costs 0.5 instead of 1.0. No wrap: A only touches B, Z only touches Y.</p>
-  <p>Fill every cell before you reach <b>4.0 demerits</b>. The centre badge always counts how many of
+  <p>Fill every cell before you run out of demerits. The centre badge always counts how many of
   the puzzle's letters you have turned up, out of its total.</p>
-  <p><b>Hard</b> gives you nothing else: no free letter, and every miss costs a full point.
+  <p><b>Hard</b> gives you nothing else: no free letter, and every miss costs a full point &mdash; but
+  the budget is <b>5.0</b> instead of 4.0.
   <b>Normal</b> publishes one letter that is definitely in the puzzle, in the centre badge.
   <b>Easy</b> publishes that letter and softens near misses to yellow.</p>
   <p>While this is open, faint arrows on the board show which way each word reads.</p>
@@ -310,9 +311,9 @@ body.barred{padding-bottom:96px}
   var ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   // centre: publish one letter that is in the puzzle. yellow: soften near misses to 0.5.
   var LEVELS = {
-    hard:   { centre: false, yellow: false },
-    normal: { centre: true,  yellow: false },
-    easy:   { centre: true,  yellow: true }
+    hard:   { centre: false, yellow: false, max: 5 },
+    normal: { centre: true,  yellow: false, max: 4 },
+    easy:   { centre: true,  yellow: true,  max: 4 }
   };
   var EPOCH = Date.UTC(2026, 0, 1);
   var game = null, mode = "daily", cellEls = {}, chipEls = {}, keyEls = {};
@@ -420,9 +421,10 @@ body.barred{padding-bottom:96px}
     $("badgeSub").textContent = found + " of " + game.puzzle.distinctCount + " letters";
 
     $("hiddenCount").textContent = WD.hiddenCells(game).length;
-    $("demeritLabel").textContent = game.demeritPoints.toFixed(1).replace(/\.0$/, "") + " / 4";
+    $("demeritLabel").textContent = game.demeritPoints.toFixed(1).replace(/\.0$/, "") +
+      " / " + game.maxDemerits;
     $("letterCount").textContent = found + " / " + game.puzzle.distinctCount;
-    $("meterFill").style.width = (game.demeritPoints / WD.MAX_DEMERITS * 100) + "%";
+    $("meterFill").style.width = (game.demeritPoints / game.maxDemerits * 100) + "%";
   }
 
   function play(letter) {
@@ -467,7 +469,7 @@ body.barred{padding-bottom:96px}
       return "<div><span>" + game.puzzle.words[k] + "</span><i>" + labels[k] + "</i></div>";
     }).join("");
     $("finLabel").textContent = (won ? "Solved on " : "Lost on ") +
-      game.demeritPoints.toFixed(1) + " / 4";
+      game.demeritPoints.toFixed(1) + " / " + game.maxDemerits;
     showResults();
   }
 
@@ -497,7 +499,7 @@ body.barred{padding-bottom:96px}
     mode = seed ? "random" : "daily";
     var level = LEVELS[$("diff").value] || LEVELS.hard;
     try { localStorage.setItem("wd-level", $("diff").value); } catch (e) {}
-    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0, level.yellow);
+    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0, level.yellow, level.max);
     $("sub").textContent = mode === "daily" ? "Daily #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
     chipEls = {};

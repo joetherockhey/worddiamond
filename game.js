@@ -135,8 +135,9 @@
     bottomRight: ["B", "BR1", "BR2", "BR3", "R"]
   };
 
-  // allowYellow off means a near miss costs the same as a far one: no softening.
-  function newGame(puzzle, revealPoints, allowYellow) {
+  // allowYellow off means a near miss costs the same as a far one: no softening,
+  // so those levels get a bigger budget to spend.
+  function newGame(puzzle, revealPoints, allowYellow, maxDemerits) {
     var cells = {};
     Object.keys(SIDES).forEach(function (side) {
       SIDES[side].forEach(function (id, i) {
@@ -155,7 +156,7 @@
       guessedLetters: [],
       guessResults: [],
       demeritPoints: 0,
-      maxDemerits: MAX_DEMERITS,
+      maxDemerits: maxDemerits || MAX_DEMERITS,
       allowYellow: allowYellow !== false,
       status: "playing"
     };
