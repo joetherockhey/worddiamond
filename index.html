@@ -5,16 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>WordDiamond</title>
 <meta name="description" content="Four five-letter words locked into a diamond. Guess letters, watch the shape fill.">
-<meta name="theme-color" content="#ffffff" id="themeColor">
+<meta name="theme-color" content="#160c2e" id="themeColor">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=2">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-167.png?v=2">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png?v=2">
+<link rel="apple-touch-icon-precomposed" href="icon-180.png?v=2">
+<link rel="manifest" href="manifest.json?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WordDiamond">
 <style>
-/* ---- light theme (default) ---- */
-:root{
+/* ---- light theme, opt in with the sun button ---- */
+:root[data-theme="light"]{
   --green:#6aaa64; --yellow:#c9b458; --red:#e05c5c; --chip-ink:#fff; --key-on-ink:#fff;
   --ink:#1a1a1b; --dim:#787c7e; --line:#d3d6da; --soft:#f6f7f8;
   --bg:#fff;
@@ -29,9 +32,10 @@
   --btn-bg:#fff; --btn-hover:var(--soft);
   --meter-track:#e8eaec;
   --card-bg:#fff; --scrim:rgba(26,26,27,.55); --blur:none;
+  --arrow:#c9ccd0;
 }
-/* ---- dark theme ---- */
-:root[data-theme="dark"]{
+/* ---- dark theme (default) ---- */
+:root{
   --green:#22c55e; --yellow:#fbbf24; --red:#fb5a76; --chip-ink:#12081f; --key-on-ink:#12081f;
   --ink:#f6f2ff; --dim:#b6a8e0; --line:rgba(255,255,255,.18); --soft:rgba(255,255,255,.07);
   --bg:
@@ -52,6 +56,7 @@
   --btn-bg:rgba(255,255,255,.12); --btn-hover:rgba(255,255,255,.2);
   --meter-track:rgba(255,255,255,.12);
   --card-bg:linear-gradient(165deg,#2c1b56,#1a0f36); --scrim:rgba(10,4,24,.82); --blur:blur(6px);
+  --arrow:rgba(255,255,255,.3);
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -66,9 +71,9 @@ body{
 header{position:relative;width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
   border-bottom:1px solid var(--line);margin-bottom:6px}
 h1{margin:0 0 2px;font-size:clamp(26px,7vw,36px);font-weight:800;letter-spacing:.01em}
-[data-theme="dark"] h1{
-  background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
+h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
   -webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme="light"] h1{background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
   color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:3px}
 .themeBtn{
@@ -87,6 +92,9 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
 
 /* ---- board ---- */
 .board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto}
+/* which way each word reads, drawn in the empty corners outside the diamond */
+.flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.flow path{fill:none;stroke:var(--arrow);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .cell{
   position:absolute;width:13.2%;aspect-ratio:1;transform:translate(-50%,-50%);
   display:grid;place-items:center;border-radius:6px;
@@ -160,12 +168,24 @@ details b{color:var(--ink)}
 .words div{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);
   border-radius:8px;padding:9px 12px;font-weight:800;letter-spacing:.14em}
 .words div i{font-style:normal;font-weight:600;letter-spacing:0;color:var(--dim);font-size:12px;align-self:center}
+
+/* ---- bar left behind while you admire the finished board ---- */
+.finbar{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:none;
+  align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
+  width:min(94vw,520px);padding:10px 12px;border-radius:14px;
+  background:var(--card-bg);border:1px solid var(--line);
+  box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:8}
+.finbar.show{display:flex}
+.finbar b{font-size:13px;font-weight:800;margin-right:2px}
+.finbar button{padding:8px 12px;font-size:13px}
+body.barred{padding-bottom:96px}
 </style>
 </head>
 <body>
 
 <header>
-  <button class="themeBtn" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode">&#127769;</button>
+  <button class="themeBtn" id="themeBtn" aria-label="Switch theme" title="Switch theme">&#9728;&#65039;</button>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
   <div class="stats">
     <div class="stat"><b id="hiddenCount">16</b><span>hidden</span></div>
@@ -208,9 +228,17 @@ details b{color:var(--ink)}
     <div class="words" id="resultWords"></div>
     <div class="controls">
       <button class="act go" id="shareBtn">Share</button>
+      <button class="act" id="admireBtn">Admire puzzle</button>
       <button class="act" id="againBtn">New puzzle</button>
     </div>
   </div>
+</div>
+
+<div class="finbar" id="finbar">
+  <b id="finLabel"></b>
+  <button class="act go" id="finShare">Share</button>
+  <button class="act" id="finResults">Results</button>
+  <button class="act" id="finNext">New puzzle</button>
 </div>
 
 <script src="words.js"></script>
@@ -229,7 +257,7 @@ details b{color:var(--ink)}
     $("themeColor").content = dark ? "#160c2e" : "#ffffff";
     try { localStorage.setItem("wd-theme", name); } catch (e) {}
   }
-  try { setTheme(localStorage.getItem("wd-theme") || "light"); } catch (e) { setTheme("light"); }
+  try { setTheme(localStorage.getItem("wd-theme") || "dark"); } catch (e) { setTheme("dark"); }
   $("themeBtn").onclick = function () {
     setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   };
@@ -274,15 +302,49 @@ details b{color:var(--ink)}
     });
   }
 
+  // board space 0..100 mapped into the square, with room left in the corners
+  function place(p) { return [7 + p[0] * 0.86, 7 + p[1] * 0.86]; }
+
+  // One arrow per side, parallel to it and pushed out into the empty corner,
+  // pointing the way that word reads.
+  function buildArrows() {
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "flow");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("aria-hidden", "true");
+    [["L", "T"], ["T", "R"], ["L", "B"], ["B", "R"]].forEach(function (side) {
+      var a = place(POS[side[0]]), b = place(POS[side[1]]);
+      var ux = b[0] - a[0], uy = b[1] - a[1], len = Math.sqrt(ux * ux + uy * uy);
+      ux /= len; uy /= len;
+      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      var nx = -uy, ny = ux;                                  // pick the normal facing away from the centre
+      if (nx * (mx - 50) + ny * (my - 50) < 0) { nx = -nx; ny = -ny; }
+      var cx = mx + nx * 14, cy = my + ny * 14, half = 13;
+      var x1 = cx - ux * half, y1 = cy - uy * half, x2 = cx + ux * half, y2 = cy + uy * half;
+      var head = function (turn) {                            // arrowhead, drawn as two strokes
+        var c = Math.cos(turn), s = Math.sin(turn);
+        return [(x2 + (-ux * c - -uy * s) * 5).toFixed(1), (y2 + (-ux * s + -uy * c) * 5).toFixed(1)];
+      };
+      var h1 = head(0.5), h2 = head(-0.5);
+      var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M" + x1.toFixed(1) + " " + y1.toFixed(1) +
+        "L" + x2.toFixed(1) + " " + y2.toFixed(1) +
+        "M" + h1[0] + " " + h1[1] + "L" + x2.toFixed(1) + " " + y2.toFixed(1) + "L" + h2[0] + " " + h2[1]);
+      svg.appendChild(path);
+    });
+    return svg;
+  }
+
   function buildBoard() {
     var b = $("board");
     b.innerHTML = "";
     cellEls = {};
+    b.appendChild(buildArrows());
     Object.keys(game.cells).forEach(function (id) {
-      var c = game.cells[id], el = document.createElement("div");
+      var c = game.cells[id], el = document.createElement("div"), xy = place(POS[id]);
       el.className = "cell" + (c.kind === "point" ? " point" : "");
-      el.style.left = (7 + POS[id][0] * 0.86) + "%";
-      el.style.top = (7 + POS[id][1] * 0.86) + "%";
+      el.style.left = xy[0] + "%";
+      el.style.top = xy[1] + "%";
       el.textContent = c.letter;
       if (c.kind === "point") el.title = "Point letter — shared by two words";
       b.appendChild(el);
@@ -290,8 +352,8 @@ details b{color:var(--ink)}
     });
     var badge = document.createElement("div");
     badge.className = "badge";
-    badge.innerHTML = "<div><b>" + game.puzzle.centreLetter + "</b><span>" +
-      game.puzzle.distinctCount + " letters</span></div>";
+    badge.innerHTML = "<div><b>" + game.puzzle.centreLetter +
+      "</b><span id=\"badgeSub\"></span></div>";
     b.appendChild(badge);
   }
 
@@ -312,9 +374,17 @@ details b{color:var(--ink)}
         ids.forEach(function (id) { cellEls[id].classList.add("done"); });
       }
     });
+    // badge counts the puzzle's letters you have actually turned up so far
+    var up = {};
+    Object.keys(game.cells).forEach(function (id) {
+      if (game.cells[id].revealed) up[game.cells[id].letter] = 1;
+    });
+    var found = Object.keys(up).length;
+    $("badgeSub").textContent = found + " of " + game.puzzle.distinctCount + " letters";
+
     $("hiddenCount").textContent = WD.hiddenCells(game).length;
     $("demeritLabel").textContent = game.demeritPoints.toFixed(1).replace(/\.0$/, "") + " / 4";
-    $("letterCount").textContent = game.puzzle.distinctCount;
+    $("letterCount").textContent = found + " / " + game.puzzle.distinctCount;
     $("meterFill").style.width = (game.demeritPoints / WD.MAX_DEMERITS * 100) + "%";
   }
 
@@ -359,7 +429,23 @@ details b{color:var(--ink)}
     $("resultWords").innerHTML = Object.keys(labels).map(function (k) {
       return "<div><span>" + game.puzzle.words[k] + "</span><i>" + labels[k] + "</i></div>";
     }).join("");
+    $("finLabel").textContent = (won ? "Solved on " : "Lost on ") +
+      game.demeritPoints.toFixed(1) + " / 4";
+    showResults();
+  }
+
+  function showResults() {
     $("overlay").classList.add("show");
+    $("finbar").classList.remove("show");
+    document.body.classList.remove("barred");
+  }
+
+  // step out of the result card to look at the finished diamond; the bar keeps
+  // share, the results card and the next puzzle one tap away
+  function admire() {
+    $("overlay").classList.remove("show");
+    $("finbar").classList.add("show");
+    document.body.classList.add("barred");
   }
 
   function shareText() {
@@ -381,27 +467,35 @@ details b{color:var(--ink)}
       keyEls[c].disabled = false;
     });
     $("overlay").classList.remove("show");
+    $("finbar").classList.remove("show");
+    document.body.classList.remove("barred");
     buildBoard();
     paint(null);
   }
 
   function randomSeed() { return "rand-" + Date.now() + "-" + Math.random(); }
 
-  buildKeyboard();
-  $("newBtn").onclick = function () { start(randomSeed()); };
-  $("againBtn").onclick = function () { start(randomSeed()); };
-  $("dailyBtn").onclick = function () { start(null); };
-  $("diff").onchange = function () { start(mode === "daily" ? null : randomSeed()); };
-  $("shareBtn").onclick = function () {
+  function share(btn) {
     var t = shareText();
     if (navigator.share) {
       navigator.share({ text: t }).catch(function () {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(t);
-      $("shareBtn").textContent = "Copied";
-      setTimeout(function () { $("shareBtn").textContent = "Share"; }, 1400);
+      btn.textContent = "Copied";
+      setTimeout(function () { btn.textContent = "Share"; }, 1400);
     }
-  };
+  }
+
+  buildKeyboard();
+  $("newBtn").onclick = function () { start(randomSeed()); };
+  $("againBtn").onclick = function () { start(randomSeed()); };
+  $("finNext").onclick = function () { start(randomSeed()); };
+  $("dailyBtn").onclick = function () { start(null); };
+  $("diff").onchange = function () { start(mode === "daily" ? null : randomSeed()); };
+  $("admireBtn").onclick = admire;
+  $("finResults").onclick = showResults;
+  $("shareBtn").onclick = function () { share($("shareBtn")); };
+  $("finShare").onclick = function () { share($("finShare")); };
   // desktop: a physical keyboard works too
   document.addEventListener("keydown", function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;

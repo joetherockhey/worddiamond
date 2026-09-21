@@ -14,8 +14,10 @@ time — never a whole word — and watch the shape fill.
 - **Red** — neither it nor its neighbours are there. Costs 1.0.
 - No alphabet wrap: A only touches B, Z only touches Y.
 - Fill every cell before you reach **4.0 demerits**.
-- The centre badge publishes one letter that is definitely in the puzzle, plus the number of
-  distinct letters across the whole diamond. It's a clue only — it reveals nothing.
+- The centre badge publishes one letter that is definitely in the puzzle, and counts how many of the
+  puzzle's distinct letters you have turned up so far (“3 of 11 letters”). It reveals nothing by itself.
+- Light grey arrows in the four corners show which way each word reads: both left-hand words start at
+  the left point, both right-hand words end at the right point.
 
 Difficulty pre-reveals 0, 1 or 2 point letters.
 
@@ -40,8 +42,11 @@ front of each pool and refuses any puzzle containing a word past position `COMMO
 keeps TULLE, DOWRY, WOOER and friends out of the board while leaving about 34 million legal diamonds
 to draw from. They stay legal words — a hand-authored puzzle may still use them.
 
-Two themes: a plain Wordle-style light palette, and the original purple dark one. The moon button
-in the header switches between them and the choice is remembered.
+Two themes. The purple dark one is the default; the sun button in the header switches to a plain
+Wordle-style light palette, and the choice is remembered.
+
+Finishing a puzzle opens the result card. “Admire puzzle” steps out of it to look at the completed
+diamond, leaving a bar at the bottom with share, the results card and the next puzzle.
 
 The daily puzzle is seeded from the date, so everyone gets the same board on the same day.
 
