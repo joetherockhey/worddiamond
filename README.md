@@ -55,6 +55,10 @@ the right. How to play, Today’s diamond, the theme, Share and the level all li
 is a plain `<details>` — the open and close behaviour is the browser’s, not ours. Everything the menu
 opens is a popup, so the board and keyboard never move.
 
+Portrait only. The manifest locks the installed app to portrait; a browser tab cannot be locked on
+iOS, so landscape on a phone gets a “turn your phone upright” screen instead. The keyboard sits on
+the bottom edge and the board takes the room left over above it.
+
 Two themes. The purple dark one is the default; Light mode in the menu switches to a plain
 Wordle-style light palette, and the choice is remembered.
 
