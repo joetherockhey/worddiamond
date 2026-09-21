@@ -22,7 +22,7 @@ time — never a whole word — and watch the shape fill.
 
 | Level | Centre letter | Near misses | Budget |
 |---|---|---|---|
-| Hard (default) | hidden, badge shows `?` | every miss costs 1.0 | 5.0 |
+| Hard (default) | hidden, badge shows the count alone | every miss costs 1.0 | 5.0 |
 | Normal | published | every miss costs 1.0 | 4.0 |
 | Easy | published | yellow, 0.5 | 4.0 |
 

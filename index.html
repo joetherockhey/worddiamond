@@ -60,16 +60,24 @@
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%}
+html,body{margin:0}
+/* one screen: the page is exactly the viewport and the board takes what is left */
+body{height:100dvh}
+body > *{flex-shrink:0}
 body{
   font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
   background:var(--bg);background-attachment:fixed;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;
-  padding:0 12px 26px;gap:10px;
+  padding:0 12px 10px;gap:7px;
+  /* on the home screen the page draws under the clock and the notch */
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:calc(12px + env(safe-area-inset-left,0px));
+  padding-right:calc(12px + env(safe-area-inset-right,0px));
 }
 
-header{position:relative;width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
-  border-bottom:1px solid var(--line);margin-bottom:6px}
+header{position:relative;width:100%;max-width:560px;text-align:center;padding:6px 0 9px;
+  border-bottom:1px solid var(--line);margin-bottom:2px}
 h1{margin:0 0 2px;font-size:clamp(22px,6.4vw,36px);font-weight:800;letter-spacing:.01em}
 h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
   -webkit-background-clip:text;background-clip:text;color:transparent}
@@ -90,17 +98,16 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
 .qrBox{background:#fff;border-radius:12px;padding:14px;margin:0 auto 14px;width:min(70vw,232px)}
 .qrBox img{display:block;width:100%;height:auto}
 .qrLink{font-size:12px;color:var(--dim);word-break:break-all;margin-bottom:16px}
-.stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
-.stat{border:1px solid var(--line);border-radius:6px;padding:5px 12px;min-width:86px;line-height:1.15}
-.stat b{display:block;font-size:17px;font-weight:700}
-.stat span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-.meter{width:100%;max-width:300px;height:6px;margin:10px auto 0;border-radius:99px;
+.dem{margin-top:8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.dem b{font-size:15px;letter-spacing:0;color:var(--ink)}
+.meter{width:100%;height:7px;margin:7px auto 0;border-radius:99px;
   background:var(--meter-track);overflow:hidden}
 .meter i{display:block;height:100%;width:0;border-radius:99px;
   background:linear-gradient(90deg,var(--yellow),var(--red));transition:width .3s}
 
 /* ---- board ---- */
-.board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto}
+.board{position:relative;height:min(92vw,460px);width:auto;aspect-ratio:1;
+  flex-shrink:1;min-height:120px;margin:0 auto}
 /* which way each word reads: faint, and only while How to play is open */
 .flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
   opacity:0;transition:opacity .25s}
@@ -129,6 +136,7 @@ body.helping .flow{opacity:1}
 }
 .badge>div{transform:rotate(-45deg);text-align:center;line-height:1}
 .badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:var(--badge-ink)}
+.badge.noclue span{font-size:clamp(12px,3.6vw,17px)}
 .badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:var(--badge-sub);letter-spacing:.03em}
 
 /* ---- tray ---- */
@@ -145,7 +153,7 @@ body.helping .flow{opacity:1}
 .kb{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;margin-top:2px}
 .kb .row{display:flex;gap:6px;justify-content:center}
 .key{
-  flex:1 1 0;max-width:46px;height:clamp(46px,9vw,56px);border:0;border-radius:4px;
+  flex:0 0 auto;width:calc((100% - 54px)/10);max-width:46px;height:clamp(46px,9vw,56px);border:0;border-radius:4px;
   font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;color:var(--key-ink);
   background:var(--key-bg);cursor:pointer;transition:transform .1s,background .2s;
 }
@@ -166,6 +174,18 @@ details{width:min(94vw,560px);font-size:13.5px;color:var(--dim);line-height:1.55
 details summary{cursor:pointer;font-weight:700;color:var(--ink);padding:6px 0}
 details b{color:var(--ink)}
 
+/* short phones: give the board room by tightening everything round it */
+@media (max-height:640px){
+  body{gap:5px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+  header{padding:4px 0 6px}
+  .dem{margin-top:5px}
+  h1{font-size:clamp(19px,6.4vw,36px)}
+  .tray{min-height:16px;gap:5px}
+  .key{height:clamp(38px,9vw,56px)}
+  button.act,select{padding:7px 10px;font-size:12.5px}
+  details summary{padding:3px 0}
+}
+
 /* ---- end screen ---- */
 .overlay{position:fixed;inset:0;background:var(--scrim);backdrop-filter:var(--blur);
   display:none;place-items:center;padding:18px;z-index:9}
@@ -182,7 +202,7 @@ details b{color:var(--ink)}
 
 /* ---- bar left behind while you admire the finished board ---- */
 .finbar{
-  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:none;
+  position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:none;
   align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
   width:min(94vw,520px);padding:10px 12px;border-radius:14px;
   background:var(--card-bg);border:1px solid var(--line);
@@ -190,7 +210,7 @@ details b{color:var(--ink)}
 .finbar.show{display:flex}
 .finbar b{font-size:13px;font-weight:800;margin-right:2px}
 .finbar button{padding:8px 12px;font-size:13px}
-body.barred{padding-bottom:96px}
+body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 </style>
 </head>
 <body>
@@ -199,11 +219,7 @@ body.barred{padding-bottom:96px}
   <button class="qrBtn" id="qrBtn" aria-label="Share this game">Share</button>
   <button class="themeBtn" id="themeBtn" aria-label="Switch theme" title="Switch theme">&#9728;&#65039;</button>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
-  <div class="stats">
-    <div class="stat"><b id="hiddenCount">16</b><span>hidden</span></div>
-    <div class="stat"><b id="demeritLabel">0 / 5</b><span>demerits</span></div>
-    <div class="stat"><b id="letterCount">&mdash;</b><span>letters</span></div>
-  </div>
+  <div class="dem"><b id="demeritLabel">0 of 5</b> demerits</div>
   <div class="meter"><i id="meterFill"></i></div>
 </header>
 
@@ -389,8 +405,10 @@ body.barred{padding-bottom:96px}
     });
     var badge = document.createElement("div");
     badge.className = "badge";
-    var clue = LEVELS[$("diff").value].centre ? game.puzzle.centreLetter : "?";
-    badge.innerHTML = "<div><b>" + clue + "</b><span id=\"badgeSub\"></span></div>";
+    var clue = LEVELS[$("diff").value].centre ? game.puzzle.centreLetter : "";
+    if (!clue) badge.className += " noclue";
+    badge.innerHTML = "<div>" + (clue ? "<b>" + clue + "</b>" : "") +
+      "<span id=\"badgeSub\"></span></div>";
     b.appendChild(badge);
   }
 
@@ -420,10 +438,8 @@ body.barred{padding-bottom:96px}
     var found = Object.keys(up).length;
     $("badgeSub").textContent = found + " of " + game.puzzle.distinctCount + " letters";
 
-    $("hiddenCount").textContent = WD.hiddenCells(game).length;
     $("demeritLabel").textContent = game.demeritPoints.toFixed(1).replace(/\.0$/, "") +
-      " / " + game.maxDemerits;
-    $("letterCount").textContent = found + " / " + game.puzzle.distinctCount;
+      " of " + game.maxDemerits;
     $("meterFill").style.width = (game.demeritPoints / game.maxDemerits * 100) + "%";
   }
 
