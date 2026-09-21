@@ -82,8 +82,8 @@ h1{margin:0 0 2px;font-size:clamp(22px,6.4vw,36px);font-weight:800;letter-spacin
 h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
   -webkit-background-clip:text;background-clip:text;color:transparent}
 [data-theme="light"] h1{background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
-h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:3px}
+h1 small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink);-webkit-text-fill-color:var(--ink);margin-top:3px}
 .hbtn{
   position:absolute;left:0;top:9px;height:34px;padding:0 8px;border-radius:17px;
   border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
@@ -546,7 +546,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     var level = LEVELS[$("diff").value] || LEVELS.hard;
     try { localStorage.setItem("wd-level", $("diff").value); } catch (e) {}
     game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0, level.yellow, level.max);
-    $("sub").textContent = mode === "daily" ? "Daily #" + dayNumber() : "Random diamond";
+    $("sub").textContent = mode === "daily" ? "Today’s diamond #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
     chipEls = {};
     Object.keys(keyEls).forEach(function (c) {
