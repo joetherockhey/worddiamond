@@ -76,7 +76,7 @@ body{
   padding-right:calc(12px + env(safe-area-inset-right,0px));
 }
 
-header{position:relative;width:100%;max-width:560px;text-align:center;padding:6px 0 9px;
+header{position:relative;z-index:6;width:100%;max-width:560px;text-align:center;padding:6px 0 9px;
   border-bottom:1px solid var(--line);margin-bottom:2px}
 h1{margin:0 0 2px;font-size:clamp(22px,6.4vw,36px);font-weight:800;letter-spacing:.01em}
 h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
@@ -84,16 +84,29 @@ h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
 [data-theme="light"] h1{background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
   color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:3px}
-.themeBtn{
-  position:absolute;right:0;top:6px;width:40px;height:40px;border-radius:50%;
+.hbtn{
+  position:absolute;left:0;top:9px;height:34px;padding:0 8px;border-radius:17px;
   border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
-  font-size:17px;line-height:1;cursor:pointer;display:grid;place-items:center}
-.themeBtn:hover{background:var(--btn-hover)}
-.qrBtn{
-  position:absolute;left:0;top:9px;height:34px;padding:0 11px;border-radius:17px;
+  font-family:inherit;font-size:10.5px;font-weight:700;letter-spacing:.02em;cursor:pointer}
+.hbtn:hover{background:var(--btn-hover)}
+/* <details> gives the dropdown its open/close for nothing */
+.menu{position:absolute;right:0;top:6px}
+.menu summary{width:40px;height:40px;padding:0;border-radius:50%;list-style:none;
   border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
-  font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer}
-.qrBtn:hover{background:var(--btn-hover)}
+  font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.menu summary::-webkit-details-marker{display:none}
+.menu summary:hover,.menu[open] summary{background:var(--btn-hover)}
+.panel{
+  position:absolute;right:0;top:46px;width:min(230px,80vw);padding:7px;
+  display:flex;flex-direction:column;gap:2px;text-align:left;
+  background:var(--card-bg);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.panel button,.panel select{
+  width:100%;text-align:left;font-family:inherit;font-size:14px;font-weight:700;
+  color:var(--ink);background:transparent;border:0;border-radius:8px;padding:10px;cursor:pointer}
+.panel button:hover{background:var(--btn-hover)}
+.panel select{background:var(--btn-bg);border:1px solid var(--line);margin-top:2px}
+.lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:8px 10px 0}
 /* the code itself always sits on white, so it scans in either theme */
 .qrBox{background:#fff;border-radius:12px;padding:14px;margin:0 auto 14px;width:min(70vw,232px)}
 .qrBox img{display:block;width:100%;height:auto}
@@ -136,7 +149,7 @@ body.helping .flow{opacity:1}
 }
 .badge>div{transform:rotate(-45deg);text-align:center;line-height:1}
 .badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:var(--badge-ink)}
-.badge.noclue span{font-size:clamp(12px,3.6vw,17px)}
+.badge.noclue span{font-size:clamp(12px,3.6vw,17px);color:var(--badge-ink)}
 .badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:var(--badge-sub);letter-spacing:.03em}
 
 /* ---- tray ---- */
@@ -150,7 +163,7 @@ body.helping .flow{opacity:1}
   75%{transform:rotate(45deg) translateX(4px)}}
 
 /* ---- keyboard ---- */
-.kb{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.kb{margin-top:auto;width:min(100%,560px);display:flex;flex-direction:column;gap:6px;margin-top:2px}
 .kb .row{display:flex;gap:6px;justify-content:center}
 .key{
   flex:0 0 auto;width:calc((100% - 54px)/10);max-width:46px;height:clamp(46px,9vw,56px);border:0;border-radius:4px;
@@ -170,9 +183,6 @@ button.act,select{
 button.act:hover,select:hover{background:var(--btn-hover)}
 button.act.go{background:var(--green);border-color:var(--green);color:var(--key-on-ink)}
 select option{color:#1b1035;background:#fff}
-details{width:min(94vw,560px);font-size:13.5px;color:var(--dim);line-height:1.55}
-details summary{cursor:pointer;font-weight:700;color:var(--ink);padding:6px 0}
-details b{color:var(--ink)}
 
 /* short phones: give the board room by tightening everything round it */
 @media (max-height:640px){
@@ -183,18 +193,21 @@ details b{color:var(--ink)}
   .tray{min-height:16px;gap:5px}
   .key{height:clamp(38px,9vw,56px)}
   button.act,select{padding:7px 10px;font-size:12.5px}
-  details summary{padding:3px 0}
 }
+
+/* narrow phones: keep the title clear of the buttons either side of it */
+@media (max-width:365px){ h1{font-size:17px} }
 
 /* ---- end screen ---- */
 .overlay{position:fixed;inset:0;background:var(--scrim);backdrop-filter:var(--blur);
   display:none;place-items:center;padding:18px;z-index:9}
 .overlay.show{display:grid}
 .card{width:min(94vw,420px);background:var(--card-bg);border:1px solid var(--line);
-  border-radius:12px;padding:24px;text-align:center;
+  border-radius:12px;padding:24px;text-align:center;max-height:86dvh;overflow:auto;
   box-shadow:0 18px 50px rgba(0,0,0,.28);animation:pop .3s ease}
 .card h2{margin:0 0 4px;font-size:25px;font-weight:800}
 .card p{margin:0 0 16px;color:var(--dim);font-size:14px}
+.card p b{color:var(--ink)}
 .words{display:grid;gap:7px;margin-bottom:18px}
 .words div{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);
   border-radius:8px;padding:9px 12px;font-weight:800;letter-spacing:.14em}
@@ -216,8 +229,22 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 <body>
 
 <header>
-  <button class="qrBtn" id="qrBtn" aria-label="Share this game">Share</button>
-  <button class="themeBtn" id="themeBtn" aria-label="Switch theme" title="Switch theme">&#9728;&#65039;</button>
+  <button class="hbtn" id="newBtn">New puzzle</button>
+  <details class="menu" id="menu">
+    <summary aria-label="Menu" title="Menu">&#8943;</summary>
+    <div class="panel" id="panel">
+      <button id="howtoBtn">How to play</button>
+      <button id="dailyBtn">Today's diamond</button>
+      <button id="themeBtn">Light mode</button>
+      <button id="qrBtn">Share</button>
+      <div class="lab">Level</div>
+      <select id="diff" title="Difficulty">
+        <option value="hard">Hard &middot; no clues</option>
+        <option value="normal">Normal &middot; centre letter</option>
+        <option value="easy">Easy &middot; centre letter + near misses</option>
+      </select>
+    </div>
+  </details>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
   <div class="dem"><b id="demeritLabel">0 of 5</b> demerits</div>
   <div class="meter"><i id="meterFill"></i></div>
@@ -228,18 +255,9 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 
 <div class="kb" id="kb"></div>
 
-<div class="controls">
-  <button class="act" id="newBtn">New puzzle</button>
-  <button class="act" id="dailyBtn">Today's diamond</button>
-  <select id="diff" title="Difficulty">
-    <option value="hard">Hard &middot; no clues</option>
-    <option value="normal">Normal &middot; centre letter</option>
-    <option value="easy">Easy &middot; centre letter + near misses</option>
-  </select>
-</div>
-
-<details id="howto">
-  <summary>How to play</summary>
+<div class="overlay" id="howto">
+  <div class="card">
+  <h2>How to play</h2>
   <p>Four five-letter words are locked into a diamond. They share their <b>point letters</b> &mdash; the
   circles belong to two words at once. Guess one letter at a time; you never type a whole word.</p>
   <p><b>Green</b> &mdash; the letter is somewhere on the diamond. Every matching cell flips at once. Free.<br>
@@ -252,8 +270,11 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   the budget is <b>5.0</b> instead of 4.0.
   <b>Normal</b> publishes one letter that is definitely in the puzzle, in the centre badge.
   <b>Easy</b> publishes that letter and softens near misses to yellow.</p>
-  <p>While this is open, faint arrows on the board show which way each word reads.</p>
-</details>
+  <p>Close this and faint arrows appear on the board for a moment, showing which way each
+  word reads.</p>
+  <div class="controls"><button class="act go" id="howtoClose">Got it</button></div>
+  </div>
+</div>
 
 <div class="overlay" id="overlay">
   <div class="card">
@@ -300,8 +321,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   function setTheme(name) {
     document.documentElement.dataset.theme = name;
     var dark = name === "dark";
-    $("themeBtn").innerHTML = dark ? "☀️" : "🌙";
-    $("themeBtn").title = $("themeBtn").ariaLabel = "Switch to " + (dark ? "light" : "dark") + " mode";
+    $("themeBtn").textContent = dark ? "☀️ Light mode" : "🌙 Dark mode";
     $("themeColor").content = dark ? "#160c2e" : "#ffffff";
     try { localStorage.setItem("wd-theme", name); } catch (e) {}
   }
@@ -564,8 +584,21 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   try { $("diff").value = localStorage.getItem("wd-level") || "hard"; } catch (e) {}
   if (!LEVELS[$("diff").value]) $("diff").value = "hard";
 
-  $("howto").addEventListener("toggle", function () {
-    document.body.classList.toggle("helping", $("howto").open);
+  var helpTimer;
+  function closeHow() {
+    $("howto").classList.remove("show");
+    document.body.classList.add("helping");
+    clearTimeout(helpTimer);
+    helpTimer = setTimeout(function () { document.body.classList.remove("helping"); }, 3500);
+  }
+  $("howtoBtn").onclick = function () { $("howto").classList.add("show"); };
+  $("howtoClose").onclick = closeHow;
+  $("howto").onclick = function (e) { if (e.target === $("howto")) closeHow(); };
+
+  // the menu opens and closes itself; it just needs closing on a pick or a click away
+  $("panel").onclick = function (e) { if (e.target.tagName !== "SELECT") $("menu").open = false; };
+  document.addEventListener("click", function (e) {
+    if (!$("menu").contains(e.target)) $("menu").open = false;
   });
 
   buildKeyboard();
@@ -573,16 +606,21 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   $("againBtn").onclick = function () { start(randomSeed()); };
   $("finNext").onclick = function () { start(randomSeed()); };
   $("dailyBtn").onclick = function () { start(null); };
-  $("diff").onchange = function () { start(mode === "daily" ? null : randomSeed()); };
+  $("diff").onchange = function () { $("menu").open = false; start(mode === "daily" ? null : randomSeed()); };
   $("admireBtn").onclick = admire;
   $("finResults").onclick = showResults;
   $("shareBtn").onclick = function () { share($("shareBtn")); };
   $("finShare").onclick = function () { share($("finShare")); };
   // desktop: a physical keyboard works too
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") { $("qrOverlay").classList.remove("show"); return; }
+    if (e.key === "Escape") {
+      $("qrOverlay").classList.remove("show");
+      if ($("howto").classList.contains("show")) closeHow();
+      $("menu").open = false;
+      return;
+    }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if ($("qrOverlay").classList.contains("show")) return;
+    if ($("qrOverlay").classList.contains("show") || $("howto").classList.contains("show")) return;
     if (game.status !== "playing") return;
     var c = e.key.toUpperCase();
     if (c.length === 1 && c >= "A" && c <= "Z") play(c);

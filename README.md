@@ -17,8 +17,8 @@ time — never a whole word — and watch the shape fill.
 - The centre badge counts how many of the puzzle's distinct letters you have turned up so far
   (“3 of 11 letters”). On Normal and Easy it also publishes one letter that is definitely in the
   puzzle — a clue only, it reveals nothing by itself.
-- Opening “How to play” fades in faint arrows in the four corners showing which way each word reads:
-  both left-hand words start at the left point, both right-hand words end at the right point.
+- Closing “How to play” leaves faint arrows in the four corners for a few seconds, showing which way
+  each word reads: both left-hand words start at the left point, both right-hand words end at the right.
 
 | Level | Centre letter | Near misses | Budget |
 |---|---|---|---|
@@ -50,10 +50,15 @@ front of each pool and refuses any puzzle containing a word past position `COMMO
 keeps TULLE, DOWRY, WOOER and friends out of the board while leaving about 34 million legal diamonds
 to draw from. They stay legal words — a hand-authored puzzle may still use them.
 
-Two themes. The purple dark one is the default; the sun button in the header switches to a plain
+The header carries only the title, the demerit bar, a New puzzle button on the left and a ⋯ menu on
+the right. How to play, Today’s diamond, the theme, Share and the level all live in that menu, which
+is a plain `<details>` — the open and close behaviour is the browser’s, not ours. Everything the menu
+opens is a popup, so the board and keyboard never move.
+
+Two themes. The purple dark one is the default; Light mode in the menu switches to a plain
 Wordle-style light palette, and the choice is remembered.
 
-The Share button top-left opens a QR code anyone can scan to open the game on their own phone. The
+Share in the menu opens a QR code anyone can scan to open the game on their own phone. The
 code is generated once at build time for this address, so the page carries no QR library and calls
 no QR service.
 
