@@ -383,7 +383,6 @@ body.barred{padding-bottom:96px}
       el.className = "cell" + (c.kind === "point" ? " point" : "");
       el.style.left = xy[0] + "%";
       el.style.top = xy[1] + "%";
-      el.textContent = c.letter;
       if (c.kind === "point") el.title = "Point letter — shared by two words";
       b.appendChild(el);
       cellEls[id] = el;
@@ -399,6 +398,7 @@ body.barred{padding-bottom:96px}
     Object.keys(game.cells).forEach(function (id) {
       var el = cellEls[id];
       el.classList.toggle("on", game.cells[id].revealed);
+      el.textContent = game.cells[id].revealed ? game.cells[id].letter : "";
       if (popIds && popIds.indexOf(id) !== -1) {
         el.classList.remove("pop");
         void el.offsetWidth;
