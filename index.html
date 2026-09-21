@@ -32,7 +32,7 @@
   --btn-bg:#fff; --btn-hover:var(--soft);
   --meter-track:#e8eaec;
   --card-bg:#fff; --scrim:rgba(26,26,27,.55); --blur:none;
-  --arrow:#c9ccd0;
+  --arrow:#b9bdc2;
 }
 /* ---- dark theme (default) ---- */
 :root{
@@ -56,7 +56,7 @@
   --btn-bg:rgba(255,255,255,.12); --btn-hover:rgba(255,255,255,.2);
   --meter-track:rgba(255,255,255,.12);
   --card-bg:linear-gradient(165deg,#2c1b56,#1a0f36); --scrim:rgba(10,4,24,.82); --blur:blur(6px);
-  --arrow:rgba(255,255,255,.3);
+  --arrow:rgba(255,255,255,.34);
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -70,7 +70,7 @@ body{
 
 header{position:relative;width:100%;max-width:560px;text-align:center;padding:8px 0 12px;
   border-bottom:1px solid var(--line);margin-bottom:6px}
-h1{margin:0 0 2px;font-size:clamp(26px,7vw,36px);font-weight:800;letter-spacing:.01em}
+h1{margin:0 0 2px;font-size:clamp(22px,6.4vw,36px);font-weight:800;letter-spacing:.01em}
 h1{background:linear-gradient(92deg,#ffd166,#f472b6 45%,#4dd8e6);
   -webkit-background-clip:text;background-clip:text;color:transparent}
 [data-theme="light"] h1{background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
@@ -81,6 +81,15 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
   border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
   font-size:17px;line-height:1;cursor:pointer;display:grid;place-items:center}
 .themeBtn:hover{background:var(--btn-hover)}
+.qrBtn{
+  position:absolute;left:0;top:9px;height:34px;padding:0 11px;border-radius:17px;
+  border:1px solid var(--line);background:var(--btn-bg);color:var(--ink);
+  font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.qrBtn:hover{background:var(--btn-hover)}
+/* the code itself always sits on white, so it scans in either theme */
+.qrBox{background:#fff;border-radius:12px;padding:14px;margin:0 auto 14px;width:min(70vw,232px)}
+.qrBox img{display:block;width:100%;height:auto}
+.qrLink{font-size:12px;color:var(--dim);word-break:break-all;margin-bottom:16px}
 .stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .stat{border:1px solid var(--line);border-radius:6px;padding:5px 12px;min-width:86px;line-height:1.15}
 .stat b{display:block;font-size:17px;font-weight:700}
@@ -92,9 +101,11 @@ h1 small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;text-
 
 /* ---- board ---- */
 .board{position:relative;width:min(92vw,460px);aspect-ratio:1;margin:0 auto}
-/* which way each word reads, drawn in the empty corners outside the diamond */
-.flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.flow path{fill:none;stroke:var(--arrow);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* which way each word reads: faint, and only while How to play is open */
+.flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+  opacity:0;transition:opacity .25s}
+body.helping .flow{opacity:1}
+.flow path{fill:none;stroke:var(--arrow);stroke-width:.9;stroke-linecap:round;stroke-linejoin:round}
 .cell{
   position:absolute;width:13.2%;aspect-ratio:1;transform:translate(-50%,-50%);
   display:grid;place-items:center;border-radius:6px;
@@ -185,6 +196,7 @@ body.barred{padding-bottom:96px}
 <body>
 
 <header>
+  <button class="qrBtn" id="qrBtn" aria-label="Share this game">Share</button>
   <button class="themeBtn" id="themeBtn" aria-label="Switch theme" title="Switch theme">&#9728;&#65039;</button>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
   <div class="stats">
@@ -210,7 +222,7 @@ body.barred{padding-bottom:96px}
   </select>
 </div>
 
-<details>
+<details id="howto">
   <summary>How to play</summary>
   <p>Four five-letter words are locked into a diamond. They share their <b>point letters</b> &mdash; the
   circles belong to two words at once. Guess one letter at a time; you never type a whole word.</p>
@@ -219,6 +231,7 @@ body.barred{padding-bottom:96px}
   <b>Red</b> &mdash; neither it nor its neighbours are here. Costs 1.0. No wrap: A only touches B, Z only touches Y.</p>
   <p>The centre badge is a free clue: one letter that is definitely in the puzzle, and how many
   different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.</p>
+  <p>While this is open, faint arrows on the board show which way each word reads.</p>
 </details>
 
 <div class="overlay" id="overlay">
@@ -230,6 +243,20 @@ body.barred{padding-bottom:96px}
       <button class="act go" id="shareBtn">Share</button>
       <button class="act" id="admireBtn">Admire puzzle</button>
       <button class="act" id="againBtn">New puzzle</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="qrOverlay">
+  <div class="card">
+    <h2>Scan to play</h2>
+    <p>Point a phone camera at this. It opens WordDiamond in the browser &mdash;
+    from there, Share &rarr; Add to Home Screen puts it on the home screen like an app.</p>
+    <div class="qrBox"><img id="qrImg" src="qr.svg" alt="QR code linking to WordDiamond" width="232" height="232"></div>
+    <div class="qrLink" id="qrLink"></div>
+    <div class="controls">
+      <button class="act go" id="qrCopy">Copy link</button>
+      <button class="act" id="qrClose">Close</button>
     </div>
   </div>
 </div>
@@ -319,11 +346,11 @@ body.barred{padding-bottom:96px}
       var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
       var nx = -uy, ny = ux;                                  // pick the normal facing away from the centre
       if (nx * (mx - 50) + ny * (my - 50) < 0) { nx = -nx; ny = -ny; }
-      var cx = mx + nx * 14, cy = my + ny * 14, half = 13;
+      var cx = mx + nx * 15, cy = my + ny * 15, half = 8;
       var x1 = cx - ux * half, y1 = cy - uy * half, x2 = cx + ux * half, y2 = cy + uy * half;
       var head = function (turn) {                            // arrowhead, drawn as two strokes
         var c = Math.cos(turn), s = Math.sin(turn);
-        return [(x2 + (-ux * c - -uy * s) * 5).toFixed(1), (y2 + (-ux * s + -uy * c) * 5).toFixed(1)];
+        return [(x2 + (-ux * c - -uy * s) * 3).toFixed(1), (y2 + (-ux * s + -uy * c) * 3).toFixed(1)];
       };
       var h1 = head(0.5), h2 = head(-0.5);
       var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -486,6 +513,28 @@ body.barred{padding-bottom:96px}
     }
   }
 
+  // the QR is generated once at build time for this exact address, so there is
+  // no library and no call out to a QR service at runtime
+  var SITE = "https://joetherockhey.github.io/worddiamond/";
+  $("qrLink").textContent = SITE;
+  $("qrBtn").onclick = function () {
+    if (navigator.share) navigator.share({ title: "WordDiamond", url: SITE }).catch(function () {});
+    $("qrOverlay").classList.add("show");
+  };
+  $("qrClose").onclick = function () { $("qrOverlay").classList.remove("show"); };
+  $("qrOverlay").onclick = function (e) { if (e.target === $("qrOverlay")) $("qrOverlay").classList.remove("show"); };
+  $("qrCopy").onclick = function () {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(SITE);
+      $("qrCopy").textContent = "Copied";
+      setTimeout(function () { $("qrCopy").textContent = "Copy link"; }, 1400);
+    }
+  };
+
+  $("howto").addEventListener("toggle", function () {
+    document.body.classList.toggle("helping", $("howto").open);
+  });
+
   buildKeyboard();
   $("newBtn").onclick = function () { start(randomSeed()); };
   $("againBtn").onclick = function () { start(randomSeed()); };
@@ -498,7 +547,9 @@ body.barred{padding-bottom:96px}
   $("finShare").onclick = function () { share($("finShare")); };
   // desktop: a physical keyboard works too
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { $("qrOverlay").classList.remove("show"); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if ($("qrOverlay").classList.contains("show")) return;
     if (game.status !== "playing") return;
     var c = e.key.toUpperCase();
     if (c.length === 1 && c >= "A" && c <= "Z") play(c);

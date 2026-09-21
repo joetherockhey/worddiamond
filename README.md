@@ -16,8 +16,8 @@ time — never a whole word — and watch the shape fill.
 - Fill every cell before you reach **4.0 demerits**.
 - The centre badge publishes one letter that is definitely in the puzzle, and counts how many of the
   puzzle's distinct letters you have turned up so far (“3 of 11 letters”). It reveals nothing by itself.
-- Light grey arrows in the four corners show which way each word reads: both left-hand words start at
-  the left point, both right-hand words end at the right point.
+- Opening “How to play” fades in faint arrows in the four corners showing which way each word reads:
+  both left-hand words start at the left point, both right-hand words end at the right point.
 
 Difficulty pre-reveals 0, 1 or 2 point letters.
 
@@ -29,6 +29,7 @@ Difficulty pre-reveals 0, 1 or 2 point letters.
 | `game.js` | Puzzle generation, validation, classification, game state |
 | `words.js` | 2,315 five-letter words, ordered most-used first |
 | `icon.svg`, `icon-*.png`, `manifest.json` | Home-screen icon: a W built from letter tiles |
+| `qr.svg` | QR code for the site, generated once at build time |
 | `test.js` | The design brief's acceptance checks — `node test.js` |
 
 The generator is the backtracking one from the brief: pick a top-left word, which fixes L and T;
@@ -44,6 +45,10 @@ to draw from. They stay legal words — a hand-authored puzzle may still use the
 
 Two themes. The purple dark one is the default; the sun button in the header switches to a plain
 Wordle-style light palette, and the choice is remembered.
+
+The Share button top-left opens a QR code anyone can scan to open the game on their own phone. The
+code is generated once at build time for this address, so the page carries no QR library and calls
+no QR service.
 
 Finishing a puzzle opens the result card. “Admire puzzle” steps out of it to look at the completed
 diamond, leaving a bar at the bottom with share, the results card and the next puzzle.
