@@ -65,6 +65,17 @@ var g7 = WD.newGame(p, 0);
 WD.revealAll(g7);
 assert.strictEqual(WD.hiddenCells(g7).length, 0);
 
+// Hard and Normal drop the near-miss softening: V sits next to U, which is on this board
+var gy = WD.newGame(p, 0, true);
+assert.strictEqual(WD.guess(gy, "V").result, "yellow");
+assert.strictEqual(gy.demeritPoints, 0.5);
+var gn = WD.newGame(p, 0, false);
+assert.strictEqual(WD.guess(gn, "V").result, "red");
+assert.strictEqual(gn.demeritPoints, 1);
+assert.strictEqual(WD.newGame(p, 0).allowYellow, true);   // default stays on
+// a green is still green with the softening off
+assert.strictEqual(WD.guess(WD.newGame(p, 0, false), "R").result, "green");
+
 // difficulty knob
 assert.strictEqual(WD.hiddenCells(WD.newGame(p, 2)).length, 14);
 

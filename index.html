@@ -216,9 +216,9 @@ body.barred{padding-bottom:96px}
   <button class="act" id="newBtn">New puzzle</button>
   <button class="act" id="dailyBtn">Today's diamond</button>
   <select id="diff" title="Difficulty">
-    <option value="0">Hard &middot; no points shown</option>
-    <option value="1">Normal &middot; 1 point shown</option>
-    <option value="2">Easy &middot; 2 points shown</option>
+    <option value="hard">Hard &middot; no clues</option>
+    <option value="normal">Normal &middot; centre letter</option>
+    <option value="easy">Easy &middot; centre letter + near misses</option>
   </select>
 </div>
 
@@ -227,10 +227,14 @@ body.barred{padding-bottom:96px}
   <p>Four five-letter words are locked into a diamond. They share their <b>point letters</b> &mdash; the
   circles belong to two words at once. Guess one letter at a time; you never type a whole word.</p>
   <p><b>Green</b> &mdash; the letter is somewhere on the diamond. Every matching cell flips at once. Free.<br>
-  <b>Yellow</b> &mdash; not on the diamond, but one of its alphabet neighbours is. Costs 0.5.<br>
-  <b>Red</b> &mdash; neither it nor its neighbours are here. Costs 1.0. No wrap: A only touches B, Z only touches Y.</p>
-  <p>The centre badge is a free clue: one letter that is definitely in the puzzle, and how many
-  different letters the whole diamond uses. Fill every cell before you reach <b>4.0 demerits</b>.</p>
+  <b>Red</b> &mdash; the letter is not here at all. Costs 1.0.<br>
+  <b>Yellow</b> &mdash; on Easy only: the letter is not here, but one of its alphabet neighbours is.
+  Costs 0.5 instead of 1.0. No wrap: A only touches B, Z only touches Y.</p>
+  <p>Fill every cell before you reach <b>4.0 demerits</b>. The centre badge always counts how many of
+  the puzzle's letters you have turned up, out of its total.</p>
+  <p><b>Hard</b> gives you nothing else: no free letter, and every miss costs a full point.
+  <b>Normal</b> publishes one letter that is definitely in the puzzle, in the centre badge.
+  <b>Easy</b> publishes that letter and softens near misses to yellow.</p>
   <p>While this is open, faint arrows on the board show which way each word reads.</p>
 </details>
 
@@ -304,6 +308,12 @@ body.barred{padding-bottom:96px}
   })();
 
   var ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+  // centre: publish one letter that is in the puzzle. yellow: soften near misses to 0.5.
+  var LEVELS = {
+    hard:   { centre: false, yellow: false },
+    normal: { centre: true,  yellow: false },
+    easy:   { centre: true,  yellow: true }
+  };
   var EPOCH = Date.UTC(2026, 0, 1);
   var game = null, mode = "daily", cellEls = {}, chipEls = {}, keyEls = {};
 
@@ -379,8 +389,8 @@ body.barred{padding-bottom:96px}
     });
     var badge = document.createElement("div");
     badge.className = "badge";
-    badge.innerHTML = "<div><b>" + game.puzzle.centreLetter +
-      "</b><span id=\"badgeSub\"></span></div>";
+    var clue = LEVELS[$("diff").value].centre ? game.puzzle.centreLetter : "?";
+    badge.innerHTML = "<div><b>" + clue + "</b><span id=\"badgeSub\"></span></div>";
     b.appendChild(badge);
   }
 
@@ -485,7 +495,9 @@ body.barred{padding-bottom:96px}
 
   function start(seed) {
     mode = seed ? "random" : "daily";
-    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), parseInt($("diff").value, 10));
+    var level = LEVELS[$("diff").value] || LEVELS.hard;
+    try { localStorage.setItem("wd-level", $("diff").value); } catch (e) {}
+    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0, level.yellow);
     $("sub").textContent = mode === "daily" ? "Daily #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
     chipEls = {};
@@ -530,6 +542,9 @@ body.barred{padding-bottom:96px}
       setTimeout(function () { $("qrCopy").textContent = "Copy link"; }, 1400);
     }
   };
+
+  try { $("diff").value = localStorage.getItem("wd-level") || "hard"; } catch (e) {}
+  if (!LEVELS[$("diff").value]) $("diff").value = "hard";
 
   $("howto").addEventListener("toggle", function () {
     document.body.classList.toggle("helping", $("howto").open);

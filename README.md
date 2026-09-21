@@ -10,16 +10,23 @@ time — never a whole word — and watch the shape fill.
 - The four words share their **point letters**. Top-left is `L _ _ _ T`, top-right `T _ _ _ R`,
   bottom-left `L _ _ _ B`, bottom-right `B _ _ _ R`. Sixteen cells on screen, four of them shared.
 - **Green** — the letter is on the diamond. Every matching cell flips at once. Costs nothing.
-- **Yellow** — the letter isn't there, but an immediate alphabet neighbour is. Costs 0.5.
-- **Red** — neither it nor its neighbours are there. Costs 1.0.
-- No alphabet wrap: A only touches B, Z only touches Y.
+- **Red** — the letter is not there. Costs 1.0.
+- **Yellow** — Easy only: not there, but an immediate alphabet neighbour is. Costs 0.5 instead of 1.0.
+  No alphabet wrap: A only touches B, Z only touches Y.
 - Fill every cell before you reach **4.0 demerits**.
-- The centre badge publishes one letter that is definitely in the puzzle, and counts how many of the
-  puzzle's distinct letters you have turned up so far (“3 of 11 letters”). It reveals nothing by itself.
+- The centre badge counts how many of the puzzle's distinct letters you have turned up so far
+  (“3 of 11 letters”). On Normal and Easy it also publishes one letter that is definitely in the
+  puzzle — a clue only, it reveals nothing by itself.
 - Opening “How to play” fades in faint arrows in the four corners showing which way each word reads:
   both left-hand words start at the left point, both right-hand words end at the right point.
 
-Difficulty pre-reveals 0, 1 or 2 point letters.
+| Level | Centre letter | Near misses |
+|---|---|---|
+| Hard (default) | hidden, badge shows `?` | every miss costs 1.0 |
+| Normal | published | every miss costs 1.0 |
+| Easy | published | yellow, 0.5 |
+
+The badge counts your progress at every level. The chosen level is remembered.
 
 ## Files
 
