@@ -245,6 +245,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
       <button id="dailyBtn">Today's diamond</button>
       <button id="themeBtn">Light mode</button>
       <button id="qrBtn">Share</button>
+      <button id="installBtn">Add to Home Screen</button>
       <div class="lab">Level</div>
       <select id="diff" title="Difficulty">
         <option value="hard">Hard &middot; no clues</option>
@@ -296,6 +297,16 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
       <button class="act" id="admireBtn">Admire puzzle</button>
       <button class="act" id="againBtn">New puzzle</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="installOverlay">
+  <div class="card">
+    <h2>Add to Home Screen</h2>
+    <p>iPhone doesn't let a website do this itself &mdash; it takes two taps in Safari:</p>
+    <p>1. Tap <b>Share</b> (the square with an arrow) in Safari's toolbar.<br>
+    2. Scroll down and tap <b>Add to Home Screen</b>.</p>
+    <div class="controls"><button class="act go" id="installClose">Got it</button></div>
   </div>
 </div>
 
@@ -591,6 +602,17 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     }
   };
 
+  // Chrome/Android hand over a real install prompt; iPhone never does, so it gets the steps
+  var installPrompt = null;
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installPrompt = e; });
+  if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) $("installBtn").hidden = true;
+  $("installBtn").onclick = function () {
+    if (installPrompt) { installPrompt.prompt(); installPrompt = null; }
+    else $("installOverlay").classList.add("show");
+  };
+  $("installClose").onclick = function () { $("installOverlay").classList.remove("show"); };
+  $("installOverlay").onclick = function (e) { if (e.target === $("installOverlay")) $("installOverlay").classList.remove("show"); };
+
   try { $("diff").value = localStorage.getItem("wd-level") || "hard"; } catch (e) {}
   if (!LEVELS[$("diff").value]) $("diff").value = "hard";
 
@@ -625,12 +647,13 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       $("qrOverlay").classList.remove("show");
+      $("installOverlay").classList.remove("show");
       if ($("howto").classList.contains("show")) closeHow();
       $("menu").open = false;
       return;
     }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if ($("qrOverlay").classList.contains("show") || $("howto").classList.contains("show")) return;
+    if (document.querySelector(".overlay.show")) return;
     if (game.status !== "playing") return;
     var c = e.key.toUpperCase();
     if (c.length === 1 && c >= "A" && c <= "Z") play(c);
