@@ -106,4 +106,7 @@ for (var j = 0; j < 300; j++) {
   });
 }
 
+// names never make a puzzle
+["HARRY", "RALPH", "BOBBY", "DUTCH"].forEach(function (n) { assert.strictEqual(WORDS.indexOf(n), -1, "name in list: " + n); });
+
 console.log("all acceptance checks passed");
