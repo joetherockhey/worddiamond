@@ -548,8 +548,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     var marks = { green: "🟩", yellow: "🟨", red: "🟥" };
     return "WordDiamond " + (mode === "daily" ? "#" + dayNumber() : "(random)") + " — " +
       (game.status === "won" ? game.demeritPoints.toFixed(1) + "/4" : "X/4") + "\n" +
-      game.guessResults.map(function (r) { return marks[r]; }).join("") + "\n" +
-      location.href;
+      game.guessResults.map(function (r) { return marks[r]; }).join("");
   }
 
   function start(seed) {
