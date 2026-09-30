@@ -4,13 +4,13 @@
     <stop offset="1" stop-color="#160c2e"/>
   </linearGradient></defs>
   <rect width="512" height="512" fill="url(#bg)"/>
-  <rect x="48.2" y="90.6" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="387.4" y="90.6" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="48.2" y="175.4" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="387.4" y="175.4" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="48.2" y="260.2" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="217.8" y="260.2" width="76.3" height="76.3" rx="14.5" fill="#4dd8e6"/>
-  <rect x="387.4" y="260.2" width="76.3" height="76.3" rx="14.5" fill="#ffd166"/>
-  <rect x="133.0" y="345.0" width="76.3" height="76.3" rx="14.5" fill="#f472b6"/>
-  <rect x="302.6" y="345.0" width="76.3" height="76.3" rx="14.5" fill="#f472b6"/>
+  <polygon points="102.4,199.7 189.4,117.8 179.2,199.7" fill="#8fe9f2"/>
+  <polygon points="189.4,117.8 322.6,117.8 256.0,199.7" fill="#d6f8fc"/>
+  <polygon points="189.4,117.8 179.2,199.7 256.0,199.7" fill="#4fd8e6"/>
+  <polygon points="322.6,117.8 256.0,199.7 332.8,199.7" fill="#8fe9f2"/>
+  <polygon points="322.6,117.8 409.6,199.7 332.8,199.7" fill="#26adc4"/>
+  <polygon points="102.4,199.7 179.2,199.7 256.0,394.2" fill="#4fd8e6"/>
+  <polygon points="179.2,199.7 256.0,199.7 256.0,394.2" fill="#8fe9f2"/>
+  <polygon points="256.0,199.7 332.8,199.7 256.0,394.2" fill="#26adc4"/>
+  <polygon points="332.8,199.7 409.6,199.7 256.0,394.2" fill="#157e9c"/>
 </svg>
