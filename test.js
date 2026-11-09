@@ -65,26 +65,11 @@ var g7 = WD.newGame(p, 0);
 WD.revealAll(g7);
 assert.strictEqual(WD.hiddenCells(g7).length, 0);
 
-// Hard and Normal drop the near-miss softening: V sits next to U, which is on this board
-var gy = WD.newGame(p, 0, true);
+// near miss: V sits next to U, which is on this board, so it is yellow at half cost
+var gy = WD.newGame(p, 0);
 assert.strictEqual(WD.guess(gy, "V").result, "yellow");
 assert.strictEqual(gy.demeritPoints, 0.5);
-var gn = WD.newGame(p, 0, false);
-assert.strictEqual(WD.guess(gn, "V").result, "red");
-assert.strictEqual(gn.demeritPoints, 1);
-assert.strictEqual(WD.newGame(p, 0).allowYellow, true);   // default stays on
-// a green is still green with the softening off
-assert.strictEqual(WD.guess(WD.newGame(p, 0, false), "R").result, "green");
-
-// hard's bigger budget: five full-point misses, and four is not yet fatal
-var gh = WD.newGame(p, 0, false, 5);
-assert.strictEqual(gh.maxDemerits, 5);
-["Z", "X", "J", "L"].forEach(function (c) { WD.guess(gh, c); });
-assert.strictEqual(gh.demeritPoints, 4);
-assert.strictEqual(gh.status, "playing");
-WD.guess(gh, "N");
-assert.strictEqual(gh.demeritPoints, 5);
-assert.strictEqual(gh.status, "lost");
+assert.strictEqual(gy.maxDemerits, 4);
 
 // difficulty knob
 assert.strictEqual(WD.hiddenCells(WD.newGame(p, 2)).length, 14);

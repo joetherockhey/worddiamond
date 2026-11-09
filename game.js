@@ -135,9 +135,7 @@
     bottomRight: ["B", "BR1", "BR2", "BR3", "R"]
   };
 
-  // allowYellow off means a near miss costs the same as a far one: no softening,
-  // so those levels get a bigger budget to spend.
-  function newGame(puzzle, revealPoints, allowYellow, maxDemerits) {
+  function newGame(puzzle, revealPoints) {
     var cells = {};
     Object.keys(SIDES).forEach(function (side) {
       SIDES[side].forEach(function (id, i) {
@@ -156,8 +154,7 @@
       guessedLetters: [],
       guessResults: [],
       demeritPoints: 0,
-      maxDemerits: maxDemerits || MAX_DEMERITS,
-      allowYellow: allowYellow !== false,
+      maxDemerits: MAX_DEMERITS,
       status: "playing"
     };
 
@@ -178,7 +175,6 @@
     if (g.guessedLetters.indexOf(letter) !== -1) return null; // re-tap does nothing
 
     var result = classify(letter, g.puzzle.distinctLetters);
-    if (result === "yellow" && !g.allowYellow) result = "red";
     var revealed = [];
 
     if (result === "green") {

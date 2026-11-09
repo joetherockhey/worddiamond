@@ -6,6 +6,13 @@
 <title>WordDiamond</title>
 <meta name="description" content="Four five-letter words locked into a diamond. Guess letters, watch the shape fill.">
 <meta name="theme-color" content="#160c2e" id="themeColor">
+<link rel="canonical" href="https://joetherockhey.github.io/worddiamond/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WordDiamond">
+<meta property="og:description" content="Four five-letter words locked into a diamond. Guess letters, watch the shape fill.">
+<meta property="og:url" content="https://joetherockhey.github.io/worddiamond/">
+<meta property="og:image" content="https://joetherockhey.github.io/worddiamond/icon-512.png">
+<meta name="twitter:card" content="summary">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=3">
 <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png?v=3">
@@ -101,12 +108,11 @@ h1 small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.14em;tex
   display:flex;flex-direction:column;gap:2px;text-align:left;
   background:var(--card-bg);border:1px solid var(--line);border-radius:12px;
   box-shadow:0 14px 34px rgba(0,0,0,.35)}
-.panel button,.panel select{
+.panel button,.panel a{
   width:100%;text-align:left;font-family:inherit;font-size:14px;font-weight:700;
-  color:var(--ink);background:transparent;border:0;border-radius:8px;padding:10px;cursor:pointer}
-.panel button:hover{background:var(--btn-hover)}
-.panel select{background:var(--btn-bg);border:1px solid var(--line);margin-top:2px}
-.lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:8px 10px 0}
+  color:var(--ink);background:transparent;border:0;border-radius:8px;padding:10px;cursor:pointer;
+  display:block;text-decoration:none}
+.panel button:hover,.panel a:hover{background:var(--btn-hover)}
 /* the code itself always sits on white, so it scans in either theme */
 .qrBox{background:#fff;border-radius:12px;padding:14px;margin:0 auto 14px;width:min(70vw,232px)}
 .qrBox img{display:block;width:100%;height:auto}
@@ -157,7 +163,6 @@ body.helping .flow{opacity:1}
 }
 .badge>div{transform:rotate(-45deg);text-align:center;line-height:1}
 .badge b{font-size:clamp(26px,9vw,44px);font-weight:800;display:block;color:var(--badge-ink)}
-.badge.noclue span{font-size:clamp(12px,3.6vw,17px);color:var(--badge-ink)}
 .badge span{font-size:clamp(9px,2.6vw,12px);font-weight:600;color:var(--badge-sub);letter-spacing:.03em}
 
 /* ---- tray ---- */
@@ -246,16 +251,11 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
       <button id="themeBtn">Light mode</button>
       <button id="qrBtn">Share</button>
       <button id="installBtn">Add to Home Screen</button>
-      <div class="lab">Level</div>
-      <select id="diff" title="Difficulty">
-        <option value="hard">Hard &middot; no clues</option>
-        <option value="normal">Normal &middot; centre letter</option>
-        <option value="easy">Easy &middot; centre letter + near misses</option>
-      </select>
+      <a href="privacy.html">Privacy</a>
     </div>
   </details>
   <h1>WordDiamond<small id="sub">Daily</small></h1>
-  <div class="dem"><b id="demeritLabel">0 of 5</b> demerits</div>
+  <div class="dem"><b id="demeritLabel">0 of 4</b> demerits</div>
   <div class="meter"><i id="meterFill"></i></div>
 </header>
 
@@ -273,14 +273,10 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   circles belong to two words at once. Guess one letter at a time; you never type a whole word.</p>
   <p><b>Green</b> &mdash; the letter is somewhere on the diamond. Every matching cell flips at once. Free.<br>
   <b>Red</b> &mdash; the letter is not here at all. Costs 1.0.<br>
-  <b>Yellow</b> &mdash; on Easy only: the letter is not here, but one of its alphabet neighbours is.
+  <b>Yellow</b> &mdash; the letter is not here, but one of its alphabet neighbours is.
   Costs 0.5 instead of 1.0. No wrap: A only touches B, Z only touches Y.</p>
-  <p>Fill every cell before you run out of demerits. The centre badge always counts how many of
-  the puzzle's letters you have turned up, out of its total.</p>
-  <p><b>Hard</b> gives you nothing else: no free letter, and every miss costs a full point &mdash; but
-  the budget is <b>5.0</b> instead of 4.0.
-  <b>Normal</b> publishes one letter that is definitely in the puzzle, in the centre badge.
-  <b>Easy</b> publishes that letter and softens near misses to yellow.</p>
+  <p>Fill every cell before you hit <b>4.0</b> demerits. The centre badge shows one letter that is
+  definitely in the puzzle, and counts how many of the puzzle's letters you have turned up.</p>
   <p>Close this and faint arrows appear on the board for a moment, showing which way each
   word reads.</p>
   <div class="controls"><button class="act go" id="howtoClose">Got it</button></div>
@@ -366,12 +362,6 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   })();
 
   var ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-  // centre: publish one letter that is in the puzzle. yellow: soften near misses to 0.5.
-  var LEVELS = {
-    hard:   { centre: false, yellow: false, max: 5 },
-    normal: { centre: true,  yellow: false, max: 4 },
-    easy:   { centre: true,  yellow: true,  max: 4 }
-  };
   var EPOCH = Date.UTC(2026, 0, 1);
   var game = null, mode = "daily", cellEls = {}, chipEls = {}, keyEls = {};
 
@@ -446,9 +436,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     });
     var badge = document.createElement("div");
     badge.className = "badge";
-    var clue = LEVELS[$("diff").value].centre ? game.puzzle.centreLetter : "";
-    if (!clue) badge.className += " noclue";
-    badge.innerHTML = "<div>" + (clue ? "<b>" + clue + "</b>" : "") +
+    badge.innerHTML = "<div><b>" + game.puzzle.centreLetter + "</b>" +
       "<span id=\"badgeSub\"></span></div>";
     b.appendChild(badge);
   }
@@ -553,9 +541,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 
   function start(seed) {
     mode = seed ? "random" : "daily";
-    var level = LEVELS[$("diff").value] || LEVELS.hard;
-    try { localStorage.setItem("wd-level", $("diff").value); } catch (e) {}
-    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0, level.yellow, level.max);
+    game = WD.newGame(WD.generate(seed || "daily-" + dayNumber()), 0);
     $("sub").textContent = mode === "daily" ? "Today’s diamond #" + dayNumber() : "Random diamond";
     $("tray").innerHTML = "";
     chipEls = {};
@@ -612,8 +598,6 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   $("installClose").onclick = function () { $("installOverlay").classList.remove("show"); };
   $("installOverlay").onclick = function (e) { if (e.target === $("installOverlay")) $("installOverlay").classList.remove("show"); };
 
-  try { $("diff").value = localStorage.getItem("wd-level") || "hard"; } catch (e) {}
-  if (!LEVELS[$("diff").value]) $("diff").value = "hard";
 
   var helpTimer;
   function closeHow() {
@@ -627,7 +611,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   $("howto").onclick = function (e) { if (e.target === $("howto")) closeHow(); };
 
   // the menu opens and closes itself; it just needs closing on a pick or a click away
-  $("panel").onclick = function (e) { if (e.target.tagName !== "SELECT") $("menu").open = false; };
+  $("panel").onclick = function () { $("menu").open = false; };
   document.addEventListener("click", function (e) {
     if (!$("menu").contains(e.target)) $("menu").open = false;
   });
@@ -637,7 +621,6 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   $("againBtn").onclick = function () { start(randomSeed()); };
   $("finNext").onclick = function () { start(randomSeed()); };
   $("dailyBtn").onclick = function () { start(null); };
-  $("diff").onchange = function () { $("menu").open = false; start(mode === "daily" ? null : randomSeed()); };
   $("admireBtn").onclick = admire;
   $("finResults").onclick = showResults;
   $("shareBtn").onclick = function () { share($("shareBtn")); };

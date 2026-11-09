@@ -11,22 +11,15 @@ time — never a whole word — and watch the shape fill.
   bottom-left `L _ _ _ B`, bottom-right `B _ _ _ R`. Sixteen cells on screen, four of them shared.
 - **Green** — the letter is on the diamond. Every matching cell flips at once. Costs nothing.
 - **Red** — the letter is not there. Costs 1.0.
-- **Yellow** — Easy only: not there, but an immediate alphabet neighbour is. Costs 0.5 instead of 1.0.
+- **Yellow**: not there, but an immediate alphabet neighbour is. Costs 0.5 instead of 1.0.
   No alphabet wrap: A only touches B, Z only touches Y.
-- Fill every cell before you run out of demerits: 5.0 on Hard, 4.0 on Normal and Easy.
-- The centre badge counts how many of the puzzle's distinct letters you have turned up so far
-  (“3 of 11 letters”). On Normal and Easy it also publishes one letter that is definitely in the
-  puzzle — a clue only, it reveals nothing by itself.
-- Closing “How to play” leaves faint arrows in the four corners for a few seconds, showing which way
+- Fill every cell before you reach 4.0 demerits.
+- The centre badge publishes one letter that is definitely in the puzzle, and counts how many of the
+  puzzle's distinct letters you have turned up so far ("3 of 11 letters").
+- Closing "How to play" leaves faint arrows in the four corners for a few seconds, showing which way
   each word reads: both left-hand words start at the left point, both right-hand words end at the right.
 
-| Level | Centre letter | Near misses | Budget |
-|---|---|---|---|
-| Hard (default) | hidden, badge shows the count alone | every miss costs 1.0 | 5.0 |
-| Normal | published | every miss costs 1.0 | 4.0 |
-| Easy | published | yellow, 0.5 | 4.0 |
-
-The badge counts your progress at every level. The chosen level is remembered.
+There is one mode for everyone. The old Easy/Normal/Hard levels are gone.
 
 ## Files
 
@@ -37,6 +30,7 @@ The badge counts your progress at every level. The chosen level is remembered.
 | `words.js` | 2,315 five-letter words, ordered most-used first |
 | `icon.svg`, `icon-*.png`, `manifest.json` | Home-screen icon: a W built from letter tiles |
 | `qr.svg` | QR code for the site, generated once at build time |
+| `privacy.html` | Privacy policy, linked from the menu |
 | `test.js` | The design brief's acceptance checks — `node test.js` |
 
 The generator is the backtracking one from the brief: pick a top-left word, which fixes L and T;
@@ -51,7 +45,7 @@ keeps TULLE, DOWRY, WOOER and friends out of the board while leaving about 34 mi
 to draw from. They stay legal words — a hand-authored puzzle may still use them.
 
 The header carries only the title, the demerit bar, a New puzzle button on the left and a ⋯ menu on
-the right. How to play, Today’s diamond, the theme, Share and the level all live in that menu, which
+the right. How to play, Today’s diamond, the theme, Share and Privacy all live in that menu, which
 is a plain `<details>` — the open and close behaviour is the browser’s, not ours. Everything the menu
 opens is a popup, so the board and keyboard never move.
 
