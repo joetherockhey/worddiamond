@@ -221,6 +221,10 @@ select option{color:#1b1035;background:#fff}
 .card h2{margin:0 0 4px;font-size:25px;font-weight:800}
 .card p{margin:0 0 16px;color:var(--dim);font-size:14px}
 .card p b{color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 6px}
+.stats div{font-size:11px;color:var(--dim);line-height:1.2}
+.stats b{display:block;font-size:22px;color:var(--ink)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .words{display:grid;gap:7px;margin-bottom:18px}
 .words div{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);
   border-radius:8px;padding:9px 12px;font-weight:800;letter-spacing:.14em}
@@ -265,6 +269,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 <div class="tray" id="tray"></div>
 
 <div class="kb" id="kb"></div>
+<div class="sr" id="say" aria-live="polite"></div>
 
 <div class="overlay" id="howto">
   <div class="card">
@@ -288,6 +293,10 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     <h2 id="resultTitle">Solved</h2>
     <p id="resultSub"></p>
     <div class="words" id="resultWords"></div>
+    <div id="statsBox" hidden>
+      <div class="stats" id="stats"></div>
+      <p id="nextIn"></p>
+    </div>
     <div class="controls">
       <button class="act go" id="shareBtn">Share</button>
       <button class="act" id="admireBtn">Admire puzzle</button>
@@ -493,6 +502,9 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     chipEls[letter] = chip;
 
     paint(out.revealed);
+    $("say").textContent = letter + ": " + (out.result === "green"
+      ? out.revealed.length + " cells" : out.result === "yellow" ? "near miss" : "miss");
+    if (mode === "daily") store("wd-daily", { day: dayNumber(), letters: game.guessedLetters });
     if (game.status !== "playing") setTimeout(finish, 700);
   }
 
@@ -515,7 +527,38 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     }).join("");
     $("finLabel").textContent = (won ? "Solved on " : "Lost on ") +
       game.demeritPoints.toFixed(1) + " / " + game.maxDemerits;
+    $("statsBox").hidden = mode !== "daily";
+    if (mode === "daily") showStats(recordDaily(won));
     showResults();
+  }
+
+  function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
+  function store(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
+
+  // daily results only, counted once per day; a streak is consecutive daily wins
+  function recordDaily(won) {
+    var day = dayNumber();
+    var st = load("wd-stats") || { played: 0, won: 0, streak: 0, best: 0, lastDay: 0, lastWin: 0 };
+    if (st.lastDay === day) return st;
+    st.played++;
+    st.lastDay = day;
+    if (won) {
+      st.won++;
+      st.streak = st.lastWin === day - 1 ? st.streak + 1 : 1;
+      st.best = Math.max(st.best, st.streak);
+      st.lastWin = day;
+    } else st.streak = 0;
+    store("wd-stats", st);
+    return st;
+  }
+
+  function showStats(st) {
+    var cells = [[st.played, "Played"], [Math.round(st.won / st.played * 100) + "%", "Won"],
+      [st.streak, "Streak"], [st.best, "Best streak"]];
+    $("stats").innerHTML = cells.map(function (c) { return "<div><b>" + c[0] + "</b>" + c[1] + "</div>"; }).join("");
+    var n = new Date(), mid = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
+    var mins = Math.ceil((mid - n) / 60000);
+    $("nextIn").textContent = "Next diamond in " + Math.floor(mins / 60) + "h " + (mins % 60) + "m";
   }
 
   function showResults() {
@@ -554,6 +597,9 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     document.body.classList.remove("barred");
     buildBoard();
     paint(null);
+    // pick up today's diamond where you left it; finishing again does not recount stats
+    var saved = mode === "daily" && load("wd-daily");
+    if (saved && saved.day === dayNumber()) saved.letters.forEach(play);
   }
 
   function randomSeed() { return "rand-" + Date.now() + "-" + Math.random(); }
@@ -642,6 +688,7 @@ body.barred{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   });
 
   start(null);
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
 })();
 </script>
 </body>

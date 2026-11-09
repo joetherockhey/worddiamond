@@ -69,3 +69,10 @@ The daily puzzle is seeded from the date, so everyone gets the same board on the
 
 Built from Joe Hoffmann's brief: a game his physicist father and arts-graduate mother could have
 played together over a cafe breakfast, because you can get in through the maths or through the words.
+
+## Saved on the device
+
+`localStorage` holds the theme (`wd-theme`), today's guesses (`wd-daily`, so a reload picks the daily
+back up and it can't be replayed) and daily stats (`wd-stats`: played, won, streak, best). Random
+puzzles are never saved or counted. `sw.js` is network-first: online always gets the latest deploy,
+offline falls back to whatever was fetched last. Nothing leaves the device.
